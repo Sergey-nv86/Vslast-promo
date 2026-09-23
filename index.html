@@ -476,6 +476,19 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif}
 .mastery-dots{display:flex;gap:6px}
 .mastery-dots span{width:5px;height:5px;border-radius:50%;background:rgba(247,242,234,.35);transition:background .3s ease}
 .mastery-dots span.active{background:var(--rose)}
+.mastery-arrow{
+  position:absolute;z-index:4;top:50%;transform:translateY(-50%);
+  width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(247,242,234,.35);
+  background:rgba(9,7,6,.35);color:var(--milk);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;cursor:pointer;
+  opacity:0;transition:opacity var(--dur-micro) var(--ease-hover),background var(--dur-micro) var(--ease-hover);
+}
+.mastery-visual:hover .mastery-arrow{opacity:1}
+.mastery-arrow:hover{background:rgba(9,7,6,.68)}
+.mastery-arrow-prev{left:14px}
+.mastery-arrow-next{right:14px}
 
 @media (max-width:960px){
   .mastery-slide.mentor-5{background-position:50% 72%}
@@ -1046,25 +1059,16 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
 }
 
 
-/* MOBILE MASTERY — pinned mentor photo + scroll-driven carousel */
+/* MOBILE MASTERY — same simple carousel as «Наша продукция» */
 @media (max-width:600px){
-  #mastery{
-    overflow:visible!important;
-  }
-  #mastery .mastery-inner{
-    overflow:visible!important;
-  }
   #mastery .mastery-visual{
-    position:-webkit-sticky!important;
-    position:sticky!important;
-    top:58px!important;
-    align-self:flex-start!important;
+    position:relative!important;
+    top:auto!important;
     width:calc(100% + 40px)!important;
-    height:56svh!important;
-    min-height:340px!important;
-    max-height:520px!important;
+    height:62svh!important;
+    min-height:380px!important;
+    max-height:560px!important;
     margin:0 -20px 46px!important;
-    z-index:20!important;
     opacity:1!important;
     transform:none!important;
   }
@@ -1085,123 +1089,15 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
     bottom:0!important;
     z-index:4!important;
   }
-}
-
-
-/* MOBILE PINNED MEDIA — Craft hours + Mastery mentors */
-@media (max-width:600px){
-  #craft .craft-inner,
-  #mastery .mastery-inner{
-    overflow:visible!important;
-  }
-
-  /* The whole visual stays at the top while its section scrolls */
-  #craft .craft-visual,
-  #mastery .mastery-visual{
-    position:-webkit-sticky!important;
-    position:sticky!important;
-    top:58px!important;
-    align-self:flex-start!important;
-    z-index:30!important;
-  }
-
-  #craft .craft-visual{
-    height:56svh!important;
-    min-height:340px!important;
-    max-height:520px!important;
-  }
-
-  #craft .craft-visual .ring-wrap{
-    position:absolute!important;
-    left:20px!important;
-    bottom:20px!important;
-    z-index:10!important;
-  }
-
-  #mastery .mastery-visual{
-    height:56svh!important;
-    min-height:340px!important;
-    max-height:520px!important;
-  }
-
-  #mastery .mastery-slide{
-    position:absolute!important;
-    inset:0!important;
-    width:100%!important;
-    height:100%!important;
-    background-size:cover!important;
-    background-position:center center!important;
-    background-repeat:no-repeat!important;
-    transform:none!important;
-  }
-}
-
-
-/* ============================================================
-   MOBILE SCROLL-STORY — deterministic iOS/Safari architecture
-   Sticky media is controlled by JS; the story has an explicit
-   scroll track so the media is not constrained by flex/grid.
-   ============================================================ */
-@media (max-width:600px){
-  #craft,#mastery{overflow:visible!important}
-
-  #craft .craft-inner,#mastery .mastery-inner{
-    display:block!important;
-    position:relative!important;
-    overflow:visible!important;
-    transform:none!important;
-    height:auto!important;
-  }
-
-  #craft .craft-visual,#mastery .mastery-visual{
-    position:sticky!important;
-    position:-webkit-sticky!important;
-    top:58px!important;
-    width:calc(100% + 40px)!important;
-    height:56svh!important;
-    min-height:340px!important;
-    max-height:520px!important;
-    margin:0 -20px 52px!important;
-    z-index:40!important;
+  #mastery .mastery-arrow{
+    width:40px!important;
+    height:40px!important;
     opacity:1!important;
-    transform:none!important;
-    float:none!important;
   }
-
-  #craft .craft-visual .visual-img{
-    position:absolute!important;inset:0!important;
-    width:100%!important;height:100%!important;
-    background-image:url("images/bread.jpg")!important;
-    background-size:cover!important;background-position:center!important;
-    background-repeat:no-repeat!important;
-    transform:none!important;animation:none!important;opacity:1!important;
-  }
-
-  #craft .craft-visual .ring-wrap{
-    position:absolute!important;left:20px!important;bottom:20px!important;
-    z-index:50!important;display:flex!important;
-    visibility:visible!important;opacity:1!important;
-  }
-
-  #mastery .mastery-visual{
-    margin-bottom:52px!important;
-  }
-  #mastery .mastery-slide{
-    position:absolute!important;inset:0!important;
-    width:100%!important;height:100%!important;
-    background-size:cover!important;background-position:center center!important;
-    background-repeat:no-repeat!important;
-    transform:none!important;opacity:0!important;
-    transition:opacity .65s ease!important;
-  }
-  #mastery .mastery-slide.is-active{opacity:1!important}
-
-  #craft .craft-text,#mastery .mastery-text{
-    display:block!important;position:relative!important;
-    width:100%!important;margin:0!important;
-    transform:none!important;
-  }
-}</style>
+  #mastery .mastery-arrow-prev{left:12px!important}
+  #mastery .mastery-arrow-next{right:12px!important}
+}
+</style>
 </head>
 <body>
 
@@ -1357,6 +1253,8 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
         <span class="mastery-caption-name" id="masteryCaptionName">GaruHaru</span>
         <div class="mastery-dots" id="masteryDots"></div>
       </div>
+      <button class="mastery-arrow mastery-arrow-prev" id="masteryPrev" type="button" aria-label="Предыдущий наставник">‹</button>
+      <button class="mastery-arrow mastery-arrow-next" id="masteryNext" type="button" aria-label="Следующий наставник">›</button>
     </div>
 
     <div class="mastery-text">
@@ -1903,48 +1801,74 @@ Motion.reveal('#mastery [data-reveal]:not(.mentor)', {stagger: 0});
 Motion.reveal('#mastery .mentor', {stagger: 90});
 Motion.cursorLight(document.querySelector('#masteryVisual'), document.querySelector('#masteryLight'));
 
-/* ---------- MOBILE SCROLL STORY: deterministic progress for Craft + Mastery ---------- */
-const isMobileStory = () => window.matchMedia('(max-width:600px)').matches;
+/* ---------- МАСТЕРСТВО: простой carousel как в «Наша продукция» ---------- */
+const masterySection = document.querySelector('#mastery');
+const masteryVisual = document.querySelector('#masteryVisual');
+const masterySlides = Array.from(document.querySelectorAll('#masteryVisual .mastery-slide'));
+const masteryDotsWrap = document.querySelector('#masteryDots');
+const masteryCaptionName = document.querySelector('#masteryCaptionName');
+const masteryPrev = document.querySelector('#masteryPrev');
+const masteryNext = document.querySelector('#masteryNext');
 
-function mobileStoryProgress(section){
-  const r=section.getBoundingClientRect();
-  const vh=window.innerHeight;
-  const travel=Math.max(section.offsetHeight-vh,1);
-  return Math.min(Math.max(-r.top/travel,0),1);
+const masteryNames = [
+  'GaruHaru',
+  'Hans Ovando',
+  'Gregory Doyen',
+  'Вера Никандрова',
+  'Мария Селянина'
+];
+
+let masteryIdx = 0;
+
+function renderMastery(index){
+  if(!masterySlides.length) return;
+  masteryIdx = (index + masterySlides.length) % masterySlides.length;
+  masterySlides.forEach((slide,i) => slide.classList.toggle('is-active', i === masteryIdx));
+  masteryCaptionName.textContent = masteryNames[masteryIdx] || '';
+  Array.from(masteryDotsWrap.children).forEach((dot,i) => {
+    dot.classList.toggle('active', i === masteryIdx);
+  });
 }
 
-function updateMobileMastery(){
-  if(!isMobileStory()) return;
-  const p=mobileStoryProgress(masterySection);
-  const idx=Math.min(Math.floor(p*masterySlides.length),masterySlides.length-1);
-  if(idx!==masteryIdx){
-    masterySlides[masteryIdx].classList.remove('is-active');
-    if(masteryDotsWrap.children[masteryIdx]) masteryDotsWrap.children[masteryIdx].classList.remove('active');
-    masteryIdx=idx;
-    masterySlides[masteryIdx].classList.add('is-active');
-    if(masteryDotsWrap.children[masteryIdx]) masteryDotsWrap.children[masteryIdx].classList.add('active');
-    masteryCaptionName.textContent=masteryNames[masteryIdx];
-  }
-}
+masterySlides.forEach((_,i) => {
+  const dot = document.createElement('span');
+  dot.setAttribute('role','button');
+  dot.setAttribute('aria-label', `Наставник ${i + 1}`);
+  dot.tabIndex = 0;
+  dot.addEventListener('click', () => renderMastery(i));
+  dot.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      renderMastery(i);
+    }
+  });
+  masteryDotsWrap.appendChild(dot);
+});
 
-function updateMobileCraft(){
-  if(!isMobileStory()) return;
-  const p=mobileStoryProgress(craftSection);
-  ringFill.style.strokeDashoffset=String(CIRC*(1-p));
-  ringNum.textContent=p>=.98?'24+':String(Math.round(p*24));
-}
+masteryPrev.addEventListener('click', e => {
+  e.stopPropagation();
+  renderMastery(masteryIdx - 1);
+});
 
-function onStoryScroll(){
-  if(isMobileStory()){
-    updateMobileMastery();
-    updateMobileCraft();
-  }else{
-    onMasteryCarouselScroll();
-    onCraftScroll();
-  }
-}
-window.addEventListener('scroll',onStoryScroll,{passive:true});
-window.addEventListener('resize',onStoryScroll);
+masteryNext.addEventListener('click', e => {
+  e.stopPropagation();
+  renderMastery(masteryIdx + 1);
+});
+
+/* swipe on mobile — same one-step switching model */
+let masteryTouchStartX = null;
+masteryVisual.addEventListener('touchstart', e => {
+  masteryTouchStartX = e.touches[0].clientX;
+}, {passive:true});
+masteryVisual.addEventListener('touchend', e => {
+  if(masteryTouchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - masteryTouchStartX;
+  if(Math.abs(dx) > 40) renderMastery(masteryIdx + (dx < 0 ? 1 : -1));
+  masteryTouchStartX = null;
+}, {passive:true});
+
+renderMastery(0);
+
 /* ---------- MASTERY MANIFESTO: dark screen -> brightness & zoom rise with scroll -> slogan fades up ---------- */
 const masteryManifesto = document.querySelector('#masteryManifesto');
 const masteryTexture = document.querySelector('#masteryTexture');
