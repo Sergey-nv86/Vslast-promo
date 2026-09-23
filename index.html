@@ -1045,14 +1045,25 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
     z-index:0!important;
   }
   #craft .craft-visual .ring-wrap{
-    position:absolute!important;
+    position:fixed!important;
     left:20px!important;
     right:auto!important;
-    bottom:20px!important;
-    z-index:5!important;
+    bottom:22px!important;
+    z-index:100!important;
     display:flex!important;
     visibility:visible!important;
+    opacity:0!important;
+    transform:translateY(12px)!important;
+    transition:opacity .35s ease,transform .35s ease!important;
+    padding:10px 14px 10px 10px;
+    border:1px solid rgba(182,169,224,.28);
+    background:rgba(23,20,17,.78);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+  }
+  #craft .craft-visual .ring-wrap.mobile-clock-active{
     opacity:1!important;
+    transform:translateY(0)!important;
   }
   #craft .craft-visual .ring-num,
   #craft .craft-visual .ring-label{visibility:visible!important;opacity:1!important}
@@ -1926,6 +1937,17 @@ function onCraftScroll() {
   ringFill.style.strokeDashoffset = String(CIRC * (1 - p));
   ringNum.textContent = p >= 0.98 ? '24+' : String(Math.round(p * 24));
   if (!Motion.reduceMotion) craftBg.style.transform = `translateY(${(-p * 22).toFixed(1)}px)`;
+
+  // Mobile: keep the fermentation clock fixed in the viewport while the
+  // visitor moves through the entire Craft section. The number follows the
+  // section progress, so it reads 0 → 24+ as the story unfolds.
+  if (window.matchMedia('(max-width:600px)').matches) {
+    const rect = craftSection.getBoundingClientRect();
+    const active = rect.top < window.innerHeight * 0.72 && rect.bottom > window.innerHeight * 0.28;
+    document.querySelector('.ring-wrap')?.classList.toggle('mobile-clock-active', active);
+  } else {
+    document.querySelector('.ring-wrap')?.classList.remove('mobile-clock-active');
+  }
 }
 window.addEventListener('scroll', onCraftScroll, {passive: true});
 window.addEventListener('resize', onCraftScroll);
