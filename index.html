@@ -827,6 +827,17 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   .craft-visual{
     position:relative!important;top:auto!important;order:0;height:58svh;min-height:350px;max-height:520px;
     margin:0 -20px 48px;z-index:1;border-left:0;border-right:0;
+    opacity:1!important;transform:none!important;
+  }
+  .craft-visual .visual-img{
+    inset:0!important;
+    background-size:cover!important;
+    background-position:58% 52%!important;
+    animation:none!important;
+  }
+  .craft-visual .ring-wrap{
+    left:20px!important;bottom:20px!important;
+    z-index:3;
   }
   .craft-text{order:1}
   .craft .kicker,.mastery .kicker{font-size:9px;letter-spacing:.2em;gap:12px;margin-bottom:20px}
@@ -861,10 +872,17 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   .mastery-visual{
     position:relative!important;top:auto!important;order:0;height:62svh;min-height:380px;max-height:560px;
     margin:0 -20px 46px;border-left:0;border-right:0;
+    opacity:1!important;transform:none!important;
+    background:var(--ink2);
   }
   .mastery-text{order:1}
-  .mastery-slide{background-position:50% 42%!important}
-  .mastery-slide.mentor-5{background-position:50% 40%!important}
+  .mastery-slide{
+    background-size:auto 100%!important;
+    background-position:center center!important;
+    background-repeat:no-repeat!important;
+    transform:scale(1)!important;
+  }
+  .mastery-slide.mentor-5{background-position:center center!important}
   .mastery-caption{padding:18px 20px}
   .mastery-caption-name{font-size:18px;margin-bottom:9px}
   .mastery .lead{margin-bottom:38px}
