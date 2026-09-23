@@ -1015,10 +1015,11 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
 
 /* FINAL MOBILE MEDIA SAFETY PATCH */
 @media (max-width:600px){
-  /* BREAD: use a real media layer, never allow the reveal state to hide it */
+  /* BREAD: keep the mobile bread image stationary while the Craft section scrolls */
   #craft .craft-visual{
     display:block!important;
-    position:relative!important;
+    position:sticky!important;
+    top:58px!important;
     width:calc(100% + 40px)!important;
     height:58svh!important;
     min-height:350px!important;
@@ -1028,6 +1029,7 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
     overflow:hidden!important;
     opacity:1!important;
     transform:none!important;
+    z-index:4!important;
   }
   #craft .craft-visual .visual-img{
     position:absolute!important;
