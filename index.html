@@ -1087,6 +1087,55 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   }
 }
 
+
+/* MOBILE PINNED MEDIA — Craft hours + Mastery mentors */
+@media (max-width:600px){
+  #craft .craft-inner,
+  #mastery .mastery-inner{
+    overflow:visible!important;
+  }
+
+  /* The whole visual stays at the top while its section scrolls */
+  #craft .craft-visual,
+  #mastery .mastery-visual{
+    position:-webkit-sticky!important;
+    position:sticky!important;
+    top:58px!important;
+    align-self:flex-start!important;
+    z-index:30!important;
+  }
+
+  #craft .craft-visual{
+    height:56svh!important;
+    min-height:340px!important;
+    max-height:520px!important;
+  }
+
+  #craft .craft-visual .ring-wrap{
+    position:absolute!important;
+    left:20px!important;
+    bottom:20px!important;
+    z-index:10!important;
+  }
+
+  #mastery .mastery-visual{
+    height:56svh!important;
+    min-height:340px!important;
+    max-height:520px!important;
+  }
+
+  #mastery .mastery-slide{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    background-size:cover!important;
+    background-position:center center!important;
+    background-repeat:no-repeat!important;
+    transform:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
