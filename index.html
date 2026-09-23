@@ -256,10 +256,10 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif}
 .mastery-manifesto{height:130svh;min-height:820px;position:relative;overflow:hidden;display:grid;place-items:center;background:var(--ink2)}
 .mastery-manifesto-inner{position:sticky;top:0;height:100svh;width:100%;display:grid;place-items:center;overflow:hidden}
 .mastery-texture{
-  position:absolute;inset:0;
+  position:absolute;inset:-8%;
   background-image:url("images/dessert-manifesto.jpg");
-  background-size:100% 100%;background-position:center;background-repeat:no-repeat;
-  filter:brightness(.18) saturate(.9) contrast(1.08);transform:scale(1);
+  background-size:cover;background-position:50% 38%;
+  filter:brightness(.14) saturate(.9) contrast(1.08);transform:scale(1.02);
   will-change:transform,filter;
 }
 .mastery-manifesto-inner:after{content:"";position:absolute;inset:0;background:rgba(16,13,11,.18)}
@@ -307,10 +307,6 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif}
 
 .quote{text-align:center;padding-top:clamp(50px,7vw,90px);border-top:1px solid rgba(247,242,234,.14)}
 .quote p{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(22px,2.6vw,34px);line-height:1.4;max-width:640px;margin:0 auto;color:var(--milk)}
-
-.about-story{max-width:820px;margin:0 auto clamp(70px,9vw,120px);font-size:clamp(15px,1.35vw,18px);line-height:1.8;opacity:.76}
-.about-story p{margin:0 0 22px}
-.about-story p:last-child{margin-bottom:0}
 
 @media (max-width:760px){
   .pillars{grid-template-columns:1fr;gap:34px}
@@ -825,9 +821,6 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   .people-text p{font-size:14px;line-height:1.72;margin-bottom:18px}
   .people-quote{font-size:20px!important;line-height:1.25!important;padding-top:18px;margin-top:2px!important}
 
-  .about-story{font-size:14px;line-height:1.72;margin-bottom:68px}
-  .about-story p{margin-bottom:18px}
-
   /* CRAFT */
   .craft{padding:78px 20px 92px}
   .craft-inner{display:flex;flex-direction:column;gap:0}
@@ -1171,12 +1164,6 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
       европейского уровня нужны не только в столицах. Дальше — просто ежедневная дисциплина:
       печь то же самое, что пекли бы для себя.
     </p>
-    <div class="about-story" data-reveal>
-      <p>Мы не хотели создавать огромную пекарню. Раньше мы думали, что развитие означает, что она должна становиться масштабнее. Больше заказов, больше продукции, больше всего.</p>
-      <p>Потом мы поняли, что не хотим, чтобы наша пекарня превратилась в огромную компанию. Мы хотим, чтобы пекарня оставалась маленькой, семейной.</p>
-      <p>Под «маленькой» мы имеем в виду — местной, творческой, личной. Нам нравится знать людей, для которых мы печём хлеб и делаем торты и десерты. Знать их вкусы и предпочтения. Давать им истинное наслаждение.</p>
-      <p>Это не говорит о том, что мы не хотим развиваться. Но следующие наши пекарни — или пекарни наших партнёров — будут именно такими же, как и наша первая пекарня в Нижневартовске.</p>
-    </div>
 
     <div class="pillars">
       <div class="pillar" data-reveal>
