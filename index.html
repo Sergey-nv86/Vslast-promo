@@ -831,9 +831,12 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   }
   .craft-visual .visual-img{
     inset:0!important;
+    background-image:url("images/bread.jpg")!important;
     background-size:cover!important;
     background-position:58% 52%!important;
+    background-repeat:no-repeat!important;
     animation:none!important;
+    opacity:1!important;
   }
   .craft-visual .ring-wrap{
     left:20px!important;bottom:20px!important;
@@ -877,11 +880,13 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   }
   .mastery-text{order:1}
   .mastery-slide{
-    background-size:auto 100%!important;
+    background-size:cover!important;
     background-position:center center!important;
     background-repeat:no-repeat!important;
     transform:scale(1)!important;
+    opacity:0;
   }
+  .mastery-slide.is-active{opacity:1!important;}
   .mastery-slide.mentor-5{background-position:center center!important}
   .mastery-caption{padding:18px 20px}
   .mastery-caption-name{font-size:18px;margin-bottom:9px}
