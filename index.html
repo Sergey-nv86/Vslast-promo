@@ -193,10 +193,33 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif}
 }
 #manifestoLine2 p:first-child{font-size:clamp(28px,3.6vw,50px)}
 @media (max-width:800px){
-  .manifesto{height:190svh;min-height:1150px}
-  .manifesto-inner{height:100svh}
-  .manifesto-line p{font-size:32px}
-  #manifestoLine2 p:first-child{font-size:27px}
+  .manifesto{
+    height:190svh;
+    min-height:1150px;
+    overflow:visible;
+  }
+  .manifesto-inner{
+    position:sticky;
+    top:0;
+    height:100svh;
+    overflow:hidden;
+  }
+  .manifesto-line{
+    padding:20px;
+  }
+  .manifesto-line p{
+    font-size:30px;
+    line-height:1.12;
+    max-width:340px;
+  }
+  #manifestoLine2 p:first-child{
+    font-size:27px;
+  }
+  #manifestoLine2 .manifesto-sub{
+    font-size:13px;
+    line-height:1.6;
+    max-width:320px;
+  }
 }
 
 /* ===================== ЛЮДИ (Сергей и Оксана) ===================== */
@@ -1626,8 +1649,17 @@ function onHeroScroll() {
   // scroll section. The progress must follow the section's actual scroll
   // travel on BOTH desktop and mobile; the previous mobile formula stopped
   // around 0.65 and could leave the final text beat almost invisible.
-  const manRange = manifesto.offsetHeight - vh;
-  let manProgress = manRange > 0 ? (-manTop) / manRange : 0;
+  const isMobileManifesto = window.matchMedia('(max-width:800px)').matches;
+  let manProgress;
+  if (isMobileManifesto) {
+    // Mobile Safari: derive progress from the section's position in the viewport
+    // rather than sticky/overflow geometry. This keeps the three phrases visible
+    // throughout the full manifesto scroll.
+    manProgress = (vh - manTop) / Math.max(manifesto.offsetHeight, vh);
+  } else {
+    const manRange = manifesto.offsetHeight - vh;
+    manProgress = manRange > 0 ? (-manTop) / manRange : 0;
+  }
   manProgress = Math.min(Math.max(manProgress, 0), 1);
 
   texture.style.transform = `scale(${(1.05 + manProgress * 0.55).toFixed(3)})`;
@@ -1643,12 +1675,11 @@ function onHeroScroll() {
   // the sequence at least one phrase remains visible, so the cinematic
   // handoff never falls to an empty black frame.
   const line1P = trapezoid(manProgress, 0, .05, .42, .54);
-  const isMobileManifesto = window.matchMedia('(max-width:800px)').matches;
   const line2P = isMobileManifesto
-    ? trapezoid(manProgress, .24, .32, .72, .82)
+    ? trapezoid(manProgress, .10, .20, .72, .86)
     : trapezoid(manProgress, .34, .42, .70, .82);
   const line3P = isMobileManifesto
-    ? trapezoid(manProgress, .68, .76, 1.5, 1.6)
+    ? trapezoid(manProgress, .70, .78, 1.5, 1.6)
     : trapezoid(manProgress, .62, .72, 1.5, 1.6);
 
   manifestoLine1.style.opacity = String(line1P);
