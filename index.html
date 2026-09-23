@@ -1643,8 +1643,13 @@ function onHeroScroll() {
   // the sequence at least one phrase remains visible, so the cinematic
   // handoff never falls to an empty black frame.
   const line1P = trapezoid(manProgress, 0, .05, .42, .54);
-  const line2P = trapezoid(manProgress, .34, .42, .70, .82);
-  const line3P = trapezoid(manProgress, .62, .72, 1.5, 1.6);
+  const isMobileManifesto = window.matchMedia('(max-width:800px)').matches;
+  const line2P = isMobileManifesto
+    ? trapezoid(manProgress, .24, .32, .72, .82)
+    : trapezoid(manProgress, .34, .42, .70, .82);
+  const line3P = isMobileManifesto
+    ? trapezoid(manProgress, .68, .76, 1.5, 1.6)
+    : trapezoid(manProgress, .62, .72, 1.5, 1.6);
 
   manifestoLine1.style.opacity = String(line1P);
   manifestoLine1.style.transform = `translateY(${(1 - line1P) * 22}px)`;
