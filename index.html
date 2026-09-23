@@ -1453,13 +1453,12 @@ function onHeroScroll() {
 
   const manTop = manifesto.getBoundingClientRect().top;
   const vh = window.innerHeight;
-  const isMobileManifesto = window.matchMedia('(max-width: 767px)').matches;
+  // Manifesto uses a sticky viewport-sized inner scene inside a taller
+  // scroll section. The progress must follow the section's actual scroll
+  // travel on BOTH desktop and mobile; the previous mobile formula stopped
+  // around 0.65 and could leave the final text beat almost invisible.
   const manRange = manifesto.offsetHeight - vh;
-  // On mobile the manifesto is exactly one viewport tall, so derive progress
-  // from its travel through the viewport instead of leaving a blank scroll tail.
-  let manProgress = isMobileManifesto
-    ? (vh - manTop) / (vh + manifesto.offsetHeight)
-    : (manRange > 0 ? (-manTop) / manRange : 0);
+  let manProgress = manRange > 0 ? (-manTop) / manRange : 0;
   manProgress = Math.min(Math.max(manProgress, 0), 1);
 
   texture.style.transform = `scale(${(1.05 + manProgress * 0.55).toFixed(3)})`;
@@ -1471,11 +1470,12 @@ function onHeroScroll() {
     if (p < c) return 1;
     return 1 - (p - c) / (d - c);
   };
-  // Overlap the text beats so the cinematic sequence never drops to black
-  // between phrases. The final line remains present through the handoff.
-  const line1P = trapezoid(manProgress, 0, .07, .29, .38);
-  const line2P = trapezoid(manProgress, .22, .32, .62, .74);
-  const line3P = trapezoid(manProgress, .64, .76, 1.5, 1.6);
+  // Crossfade the three phrases with generous overlap. At every point in
+  // the sequence at least one phrase remains visible, so the cinematic
+  // handoff never falls to an empty black frame.
+  const line1P = trapezoid(manProgress, 0, .08, .34, .46);
+  const line2P = trapezoid(manProgress, .28, .38, .66, .78);
+  const line3P = trapezoid(manProgress, .60, .70, 1.5, 1.6);
 
   manifestoLine1.style.opacity = String(line1P);
   manifestoLine1.style.transform = `translateY(${(1 - line1P) * 22}px)`;
