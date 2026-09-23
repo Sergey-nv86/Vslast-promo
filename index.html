@@ -1,0 +1,1695 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Всласть — пекарня и кондитерская</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap');
+
+/* ===================== DESIGN TOKENS ===================== */
+:root{
+  --ink:#171411;
+  --ink2:#100d0b;
+  --milk:#f7f2ea;
+  --cream:#eee5d8;
+  --brass:#b79a6a;
+  --lavender:#b6a9e0;
+  --rose:#d9a4a0;
+  --vanilla:#f3e9d7;
+  --vanilla-ink:#2c2116;
+
+  /* motion tokens — см. систему моушен-дизайна */
+  --ease-reveal:cubic-bezier(.16,.84,.44,1);
+  --ease-hover:cubic-bezier(.4,0,.2,1);
+  --ease-cinematic:cubic-bezier(.65,0,.35,1);
+  --dur-micro:.25s;
+  --dur-reveal:.9s;
+
+  /* single source of truth for the bread photo path — used 6× across the page */
+  --img-bread:url("images/bread.jpg");
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--ink)}
+body{margin:0;background:var(--ink);color:var(--milk);font-family:Manrope,system-ui,sans-serif}
+a{color:inherit}
+h1,h2,h3{font-family:Fraunces,Georgia,serif}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.85}}
+
+/* generic scroll-reveal state, used by every section below the hero */
+[data-reveal]{opacity:0;transform:translateY(22px);
+  transition:opacity var(--dur-reveal) var(--ease-reveal),transform var(--dur-reveal) var(--ease-reveal)}
+[data-reveal].reveal{opacity:1;transform:translateY(0)}
+
+/* ===================== GLOBAL NAV ===================== */
+#siteNav{
+  position:fixed;top:0;left:0;right:0;z-index:50;height:80px;
+  display:flex;align-items:center;justify-content:center;
+  padding:0 clamp(24px,5.5vw,80px);
+  font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  background:transparent;border-bottom:1px solid transparent;
+  transition:background .5s var(--ease-hover),border-color .5s var(--ease-hover);
+  opacity:0;animation:fadeUp .7s 2s both;
+}
+#siteNav.scrolled{background:rgba(23,20,17,.78);backdrop-filter:blur(14px);border-color:rgba(247,242,234,.08)}
+.navlinks{display:flex;gap:clamp(16px,2.2vw,40px)}
+#siteNav a{text-decoration:none;color:var(--milk);opacity:.82;transition:opacity var(--dur-micro) var(--ease-hover)}
+#siteNav a:hover{opacity:1}
+.nav-app{position:absolute;right:clamp(24px,5.5vw,80px);white-space:nowrap}
+@media (max-width:800px){
+  #siteNav{height:68px}
+  .navlinks{display:none}
+  .nav-app{font-size:9px}
+}
+
+/* ===================== HERO ===================== */
+.hero{height:100svh;min-height:680px;position:relative;overflow:hidden;background:var(--ink);isolation:isolate}
+.visual-base{position:absolute;inset:0;background:var(--ink)}
+.visual-patches{position:absolute;inset:0;z-index:1}
+.patch{
+  position:absolute;border-radius:50%;
+  background-image:var(--img-bread);
+  background-size:cover;background-position:66% 42%;background-attachment:fixed;
+  -webkit-mask-image:radial-gradient(circle,#000 52%,transparent 100%);
+  mask-image:radial-gradient(circle,#000 52%,transparent 100%);
+  filter:blur(9px) brightness(.85);opacity:0;transform:scale(.5);
+  animation:patchIn .6s ease-out forwards;
+}
+.p1{left:56%;top:34%;width:92px;height:92px;animation-delay:.92s}
+.p2{left:69%;top:24%;width:66px;height:66px;animation-delay:1.04s}
+.p3{left:76%;top:46%;width:118px;height:118px;animation-delay:1.14s}
+.p4{left:60%;top:56%;width:82px;height:82px;animation-delay:1.26s}
+.p5{left:82%;top:36%;width:58px;height:58px;animation-delay:1.36s}
+.p6{left:70%;top:64%;width:100px;height:100px;animation-delay:1.46s}
+.p7{left:50%;top:48%;width:70px;height:70px;animation-delay:1.56s}
+@keyframes patchIn{
+  from{opacity:0;transform:scale(.45);filter:blur(11px) brightness(.8)}
+  to{opacity:1;transform:scale(1);filter:blur(0) brightness(.95)}
+}
+.visual{
+  position:absolute;inset:0;z-index:2;
+  background-image:var(--img-bread);
+  background-size:cover;background-position:66% 42%;
+  filter:saturate(.92) contrast(1.04);
+  opacity:0;transform:scale(1);
+  animation:visualFadeIn 1.3s 1.55s ease-out forwards;
+  will-change:transform;
+}
+.visual:after{
+  content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(circle at 73% 48%,rgba(215,155,79,.12),transparent 25%),
+    linear-gradient(90deg,rgba(23,20,17,.94) 0%,rgba(23,20,17,.72) 28%,rgba(23,20,17,.14) 58%,rgba(23,20,17,.24) 100%),
+    linear-gradient(0deg,rgba(23,20,17,.35),transparent 35%);
+}
+@keyframes visualFadeIn{from{opacity:0}to{opacity:1}}
+.light{
+  position:absolute;z-index:1;width:38vw;height:38vw;min-width:360px;min-height:360px;
+  left:-14vw;top:-15vw;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(202,145,79,.34),rgba(202,145,79,.08) 34%,transparent 70%);
+  filter:blur(22px);mix-blend-mode:screen;opacity:0;
+  animation:lightIn 1.4s .05s ease-out forwards;
+}
+@keyframes lightIn{from{opacity:0;transform:scale(.8)}to{opacity:.55;transform:scale(1)}}
+.steam-glow{
+  position:absolute;z-index:2;pointer-events:none;
+  left:60%;top:-6%;width:16vw;height:48vh;min-width:130px;
+  background:linear-gradient(180deg,rgba(255,238,214,.2),rgba(255,238,214,0) 72%);
+  filter:blur(20px);mix-blend-mode:screen;opacity:0;
+  animation:steamIn 2.2s 2.7s ease-out forwards, steamDrift 6.5s 5s ease-in-out infinite;
+}
+@keyframes steamIn{from{opacity:0}to{opacity:.5}}
+@keyframes steamDrift{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-16px) scaleY(1.05)}}
+
+.content{position:absolute;z-index:4;left:clamp(28px,7vw,100px);top:50%;transform:translateY(-42%);width:min(500px,42vw)}
+.brand{width:190px;max-width:48%;height:auto;display:block;filter:brightness(0) invert(1);margin-bottom:42px;opacity:0;animation:fadeUp .9s 2s both}
+.kicker-line{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:0;animation:fadeUp .8s 2.3s both;margin-bottom:22px}
+.hero h1{
+  font-weight:500;font-size:clamp(48px,5.2vw,76px);line-height:.96;letter-spacing:-.03em;
+  margin:0 0 24px;max-width:620px;opacity:0;animation:fadeUp 1s 2.5s both;
+}
+.categories{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:0;margin-bottom:38px;animation:fadeUp .8s 2.8s both}
+.cta{display:inline-flex;align-items:center;gap:18px;text-decoration:none;font-size:13px;opacity:0;animation:fadeUp .8s 3.05s both}
+.cta .line{width:96px;height:1px;background:currentColor;transition:width var(--dur-micro) var(--ease-hover)}
+.cta:hover .line{width:145px}
+
+.cursor-light{
+  position:absolute;z-index:3;width:130px;height:130px;border-radius:50%;pointer-events:none;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,rgba(225,173,105,.16),transparent 68%);
+  opacity:0;transition:opacity var(--dur-micro)
+}
+.progress{position:absolute;z-index:5;right:clamp(24px,5.5vw,80px);bottom:42px;display:flex;align-items:center;gap:12px;font-size:10px;letter-spacing:.1em;opacity:.72}
+.progress i{display:block;width:70px;height:1px;background:rgba(247,242,234,.5)}
+.scroll-hint{position:absolute;z-index:5;bottom:36px;left:50%;transform:translateX(-50%);font-size:9px;letter-spacing:.18em;text-transform:uppercase;opacity:.58;animation:pulse 2.4s 3.4s infinite}
+
+@media (max-width:800px){
+  .hero{min-height:760px}
+  .visual,.patch{background-position:72% 38%}
+  .content{left:20px;right:20px;top:auto;bottom:100px;transform:none;width:auto}
+  .brand{width:145px;max-width:none;margin-bottom:28px}
+  .hero h1{font-size:50px;max-width:330px}
+  .categories{font-size:9px;line-height:1.8;margin-bottom:28px}
+  .scroll-hint{display:none}
+  .progress{right:20px;bottom:28px}
+  .steam-glow{left:66%;width:26vw}
+}
+
+/* ===================== MANIFESTO ===================== */
+.manifesto{height:200svh;min-height:1200px;position:relative;overflow:hidden;display:grid;place-items:center;background:var(--ink2)}
+.manifesto-inner{position:sticky;top:0;height:100svh;width:100%;display:grid;place-items:center;overflow:hidden}
+.texture{
+  position:absolute;inset:-8%;
+  background-image:url("images/manifesto-bread.jpg");
+  background-size:cover;background-position:50% 45%;
+  filter:brightness(.42) saturate(.85) contrast(1.1);transform:scale(1.05);
+  will-change:transform,filter;
+}
+.manifesto-inner:after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(16,13,11,.10) 0%,rgba(16,13,11,.12) 72%,rgba(16,13,11,.02) 100%);
+}
+.manifesto-inner:before{
+  /* continuous visual handoff into the craft section */
+  content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,transparent 0%,transparent 72%,rgba(182,169,224,.10) 94%,rgba(182,169,224,.16) 100%);
+  pointer-events:none;
+}
+.manifesto-line{
+  position:absolute;inset:0;z-index:2;display:grid;place-items:center;text-align:center;
+  padding:24px;pointer-events:none;will-change:transform,opacity;opacity:0;
+}
+.manifesto-line p{
+  margin:0;font-family:Fraunces,Georgia,serif;font-weight:500;
+  font-size:clamp(34px,4.6vw,64px);line-height:1.18;letter-spacing:-.02em;max-width:800px;color:var(--milk);
+}
+.manifesto-line .manifesto-sub{
+  font-family:Manrope,system-ui,sans-serif;font-weight:400;
+  font-size:clamp(14px,1.3vw,17px);line-height:1.75;opacity:.72;margin-top:22px;max-width:520px;
+}
+#manifestoLine2 p:first-child{font-size:clamp(28px,3.6vw,50px)}
+@media (max-width:800px){
+  .manifesto{height:190svh;min-height:1150px}
+  .manifesto-inner{height:100svh}
+  .manifesto-line p{font-size:32px}
+  #manifestoLine2 p:first-child{font-size:27px}
+}
+
+/* ===================== ЛЮДИ (Сергей и Оксана) ===================== */
+.people{position:relative;min-height:100svh;overflow:hidden;background:var(--ink);display:flex;align-items:center}
+.people-photo{
+  position:absolute;inset:0;background-image:url("images/founders.jpg");
+  background-size:cover;background-position:50% 20%;
+  filter:brightness(.5) saturate(.85) blur(7px) grayscale(.2);
+  transition:filter 1.6s var(--ease-reveal);
+}
+.people-photo.reveal{filter:brightness(.6) saturate(.95) blur(0) grayscale(0)}
+.people-photo:after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(9,7,6,.9) 0%,rgba(9,7,6,.6) 42%,rgba(9,7,6,.18) 78%);
+}
+.people-grain{
+  position:absolute;inset:0;opacity:.15;mix-blend-mode:overlay;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.people-text{position:relative;z-index:1;max-width:520px;padding:clamp(100px,14vw,170px) clamp(24px,7vw,100px)}
+.people-lead{
+  font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:500;
+  font-size:clamp(28px,3vw,42px);margin:0 0 26px;color:var(--milk);
+}
+.people-text p{font-size:15px;line-height:1.85;opacity:.82;margin:0 0 24px;color:var(--milk)}
+.people-quote{
+  font-family:Fraunces,Georgia,serif;font-style:italic;
+  font-size:clamp(19px,1.8vw,24px)!important;opacity:1!important;color:var(--brass);
+  border-top:1px solid rgba(247,242,234,.14);padding-top:24px;margin-top:6px!important;margin-bottom:0!important;
+}
+@media (max-width:760px){
+  .people-text{max-width:none}
+  .people-photo{background-position:62% 18%}
+  .people-photo:after{background:linear-gradient(180deg,rgba(9,7,6,.35) 20%,rgba(9,7,6,.92) 78%)}
+}
+
+/* ===================== MASTERY MANIFESTO (dessert counterpart of the bread manifesto scene) ===================== */
+.mastery-manifesto{height:130svh;min-height:820px;position:relative;overflow:hidden;display:grid;place-items:center;background:var(--ink2)}
+.mastery-manifesto-inner{position:sticky;top:0;height:100svh;width:100%;display:grid;place-items:center;overflow:hidden}
+.mastery-texture{
+  position:absolute;inset:-8%;
+  background-image:url("images/dessert-manifesto.jpg");
+  background-size:cover;background-position:50% 38%;
+  filter:brightness(.14) saturate(.9) contrast(1.08);transform:scale(1.02);
+  will-change:transform,filter;
+}
+.mastery-manifesto-inner:after{content:"";position:absolute;inset:0;background:rgba(16,13,11,.18)}
+.mastery-manifesto-inner:before{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:radial-gradient(ellipse at 50% 60%,rgba(217,164,160,.12),transparent 60%);
+  pointer-events:none;
+}
+.mastery-manifesto h2{
+  position:relative;z-index:2;text-align:center;max-width:900px;
+  font-weight:500;font-size:clamp(46px,6vw,92px);line-height:.95;letter-spacing:-.03em;margin:0;padding:24px;
+  opacity:0;transform:translateY(34px);will-change:transform,opacity;
+}
+.mastery-manifesto h2 em{font-style:italic;color:var(--rose)}
+@media (max-width:800px){
+  .mastery-manifesto{height:120svh;min-height:700px}
+  .mastery-manifesto-inner{height:100svh}
+  .mastery-manifesto h2{font-size:44px}
+}
+
+/* ===================== О НАС (dark, same premium register as the rest of the site) ===================== */
+.about{background:var(--ink);color:var(--milk);position:relative;padding:clamp(96px,13vw,170px) clamp(24px,7vw,100px);border-top:1px solid rgba(247,242,234,.08)}
+.about-inner{max-width:1080px;margin:0 auto}
+.about .kicker-tag{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin-bottom:26px}
+.about h2{font-weight:500;font-size:clamp(34px,4.6vw,60px);line-height:1.04;letter-spacing:-.02em;max-width:760px;margin:0 0 26px}
+.about .lead{max-width:600px;font-size:clamp(15px,1.3vw,17px);line-height:1.75;opacity:.72;margin:0 0 clamp(64px,8vw,100px)}
+
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(28px,4vw,56px);border-top:1px solid rgba(247,242,234,.14);padding-top:44px;margin-bottom:clamp(70px,9vw,110px)}
+.pillar h3{font-weight:500;font-size:22px;margin:0 0 14px}
+.pillar p{font-size:14px;line-height:1.8;opacity:.68;margin:0}
+
+.founders{display:flex;align-items:center;gap:clamp(32px,4.5vw,64px);margin-bottom:clamp(70px,9vw,110px);flex-wrap:wrap}
+.founders-photo{
+  position:relative;overflow:hidden;flex:1.3;min-width:300px;aspect-ratio:16/10;
+  background-image:url("images/founders.jpg");
+  background-size:cover;background-position:50% 22%;
+  border:1px solid rgba(247,242,234,.14);
+}
+.founders-photo:after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 55%,rgba(9,7,6,.62));
+}
+.founders-text{flex:1;min-width:260px;max-width:420px;font-size:14px;line-height:1.8;opacity:.7}
+.founders-text b{display:block;font-family:Fraunces,Georgia,serif;font-size:17px;font-weight:500;opacity:1;margin-bottom:8px;color:var(--milk)}
+
+.quote{text-align:center;padding-top:clamp(50px,7vw,90px);border-top:1px solid rgba(247,242,234,.14)}
+.quote p{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:400;font-size:clamp(22px,2.6vw,34px);line-height:1.4;max-width:640px;margin:0 auto;color:var(--milk)}
+
+@media (max-width:760px){
+  .pillars{grid-template-columns:1fr;gap:34px}
+  .founders{flex-direction:column;text-align:left}
+  .founders-photo{width:100%}
+}
+
+/* ===================== РЕМЕСЛО (lavender) ===================== */
+.craft{position:relative;background:var(--ink);margin-top:-1px;padding:clamp(96px,14vw,180px) clamp(24px,7vw,100px) clamp(110px,15vw,200px)}
+.craft-bg{
+  position:absolute;inset:0;z-index:0;
+  background-image:var(--img-bread);
+  background-size:cover;background-position:74% 40%;
+  opacity:.1;filter:grayscale(.4) contrast(1.05) blur(1px);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,transparent 38%,#000 78%);
+  mask-image:linear-gradient(90deg,transparent 0%,transparent 38%,#000 78%);
+  will-change:transform;
+}
+.craft-bg:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 82% 30%,rgba(182,169,224,.16),transparent 55%)}
+.craft:before{
+  content:"";position:absolute;left:0;right:0;top:0;height:clamp(70px,10vw,140px);
+  background:linear-gradient(180deg,rgba(182,169,224,.10),transparent);
+  pointer-events:none;z-index:0;
+}
+.craft-inner{position:relative;z-index:1;max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(48px,6vw,96px);align-items:start}
+.craft-text{min-width:0}
+
+.craft-visual{
+  position:-webkit-sticky;position:sticky;top:clamp(90px,10vh,140px);height:min(74vh,640px);min-height:420px;
+  overflow:hidden;isolation:isolate;border:1px solid rgba(182,169,224,.22);
+  opacity:0;transform:scale(.97);transition:opacity 1.1s ease,transform 1.1s ease;
+}
+.craft-visual.reveal{opacity:1;transform:scale(1)}
+.visual-img{
+  position:absolute;inset:-6%;
+  background-image:var(--img-bread);
+  background-size:cover;background-position:60% 55%;
+  filter:saturate(.88) contrast(1.08) brightness(.72);
+  animation:slowPan 19s ease-in-out infinite;will-change:transform;
+}
+@keyframes slowPan{0%,100%{background-position:60% 55%}50%{background-position:56% 51%}}
+.visual-img:after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,rgba(23,20,17,.5),transparent 30%,transparent 68%,rgba(23,20,17,.65)),
+    radial-gradient(circle at 30% 20%,rgba(182,169,224,.14),transparent 45%);
+}
+.visual-light{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(220px circle at var(--x,50%) var(--y,50%),rgba(233,196,140,.28),transparent 62%);
+  opacity:0;transition:opacity .3s;
+}
+.craft-visual:hover .visual-light{opacity:1}
+
+.ring-wrap{position:absolute;left:26px;bottom:26px;z-index:2;display:flex;align-items:center;gap:16px;color:var(--milk)}
+.ring-wrap svg{transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:rgba(247,242,234,.18);stroke-width:2.4}
+.ring-fill{fill:none;stroke:var(--lavender);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:169.6;stroke-dashoffset:169.6;transition:stroke-dashoffset .1s linear}
+.ring-num{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:500;font-size:22px;line-height:1}
+.ring-label{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;max-width:88px;line-height:1.4}
+
+.craft .kicker{display:flex;align-items:center;gap:16px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--lavender);margin-bottom:28px}
+.craft .kicker i{display:block;width:38px;height:1px;background:var(--lavender);opacity:.6}
+.craft h2{font-weight:500;font-size:clamp(38px,5.6vw,78px);line-height:.98;letter-spacing:-.03em;max-width:820px;margin:0 0 30px}
+.craft h2 em{font-style:italic;color:var(--lavender)}
+.craft .lead{max-width:560px;font-size:clamp(15px,1.35vw,18px);line-height:1.7;opacity:.76;margin:0 0 clamp(64px,8vw,110px)}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid rgba(247,242,234,.14);margin-bottom:clamp(80px,10vw,130px)}
+.stat{padding:28px 20px 24px 0;border-right:1px solid rgba(247,242,234,.14)}
+.stat:nth-child(2n){border-right:none}
+.stat:nth-child(n+3){border-top:1px solid rgba(247,242,234,.14)}
+.stat b{display:block;font-family:Fraunces,Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(36px,3.6vw,58px);color:var(--milk);line-height:1;margin-bottom:14px;text-shadow:0 0 34px rgba(182,169,224,.25)}
+.stat span{display:block;font-size:12px;line-height:1.55;opacity:.62;max-width:190px}
+
+.blocks{display:grid;grid-template-columns:1fr;gap:40px;margin-bottom:clamp(90px,11vw,140px)}
+.blocks .divider{height:1px;background:linear-gradient(90deg,rgba(182,169,224,.35),transparent 70%)}
+.block h3{font-weight:500;font-size:clamp(23px,2vw,30px);margin:0 0 20px;letter-spacing:-.01em}
+.block p{font-size:14.5px;line-height:1.85;opacity:.72;margin:0 0 16px}
+.block p:last-child{margin-bottom:0}
+.block strong{color:var(--lavender);font-weight:600}
+
+.closer{text-align:center;padding-top:clamp(50px,7vw,90px);border-top:1px solid rgba(247,242,234,.14)}
+.closer p{font-family:Fraunces,Georgia,serif;font-style:italic;font-size:clamp(20px,2.4vw,32px);line-height:1.4;max-width:660px;margin:0 auto}
+.closer p em{color:var(--lavender);font-style:italic}
+
+@media (max-width:960px){
+  .craft-inner{grid-template-columns:1fr}
+  .craft-text{order:1}
+  .craft-visual{
+    position:-webkit-sticky;position:sticky;top:60px;
+    height:38vh;min-height:260px;order:0;margin-bottom:22px;z-index:1;
+  }
+}
+
+/* ===================== МАСТЕРСТВО (rose — mirrors Ремесло, but knowledge instead of time) ===================== */
+.mastery{position:relative;background:var(--ink2);padding:clamp(96px,14vw,180px) clamp(24px,7vw,100px) clamp(110px,15vw,200px);border-top:1px solid rgba(247,242,234,.08)}
+.mastery-inner{position:relative;z-index:1;max-width:1320px;margin:0 auto;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(48px,6vw,96px);align-items:start}
+.mastery-text{min-width:0}
+
+.mastery .kicker{display:flex;align-items:center;gap:16px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--rose);margin-bottom:28px}
+.mastery .kicker i{display:block;width:38px;height:1px;background:var(--rose);opacity:.6}
+.mastery h2{font-weight:500;font-size:clamp(38px,5.6vw,78px);line-height:.98;letter-spacing:-.03em;max-width:820px;margin:0 0 30px}
+.mastery h2 em{font-style:italic;color:var(--rose)}
+.mastery .lead{max-width:560px;font-size:clamp(15px,1.35vw,18px);line-height:1.7;opacity:.76;margin:0 0 clamp(56px,7vw,90px)}
+
+.mentors{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid rgba(247,242,234,.14);margin-bottom:clamp(80px,10vw,130px)}
+.mentor{
+  padding:22px clamp(18px,2vw,28px) 20px 0;margin-right:clamp(18px,2vw,28px);
+  border-right:1px solid rgba(247,242,234,.14);
+}
+.mentor:last-child{border-right:none;margin-right:0}
+.mentor b{display:block;font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:500;font-size:17px;color:var(--milk);margin-bottom:4px;white-space:nowrap}
+.mentor span{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.55}
+
+.mastery .blocks{display:grid;grid-template-columns:1fr;gap:40px;margin-bottom:clamp(90px,11vw,140px)}
+.mastery .blocks .divider{height:1px;background:linear-gradient(90deg,rgba(217,164,160,.4),transparent 70%)}
+.mastery .block strong{color:var(--rose);font-weight:600}
+
+.mastery .closer{text-align:center;padding-top:clamp(50px,7vw,90px);border-top:1px solid rgba(247,242,234,.14)}
+.mastery .closer p em{color:var(--rose);font-style:italic}
+.signature-line{display:block;margin:22px auto 0;opacity:.85}
+.signature-line path{
+  stroke-dasharray:420;stroke-dashoffset:420;
+  transition:stroke-dashoffset 1.4s .25s var(--ease-reveal);
+}
+.closer.reveal .signature-line path{stroke-dashoffset:0}
+
+.mastery-visual{
+  position:-webkit-sticky;position:sticky;top:clamp(90px,10vh,140px);height:min(74vh,640px);min-height:420px;
+  overflow:hidden;isolation:isolate;border:1px solid rgba(217,164,160,.25);
+  opacity:0;transform:scale(.97);transition:opacity 1.1s ease,transform 1.1s ease;
+  display:flex;align-items:flex-end;
+}
+.mastery-visual.reveal{opacity:1;transform:scale(1)}
+
+.mastery-slide{
+  position:absolute;inset:0;z-index:0;
+  background-size:cover;background-repeat:no-repeat;
+  opacity:0;transform:scale(1.03);
+  filter:saturate(.94) contrast(1.04) brightness(.9);
+  transition:opacity 1.3s var(--ease-reveal),transform 1.6s var(--ease-reveal);
+}
+.mastery-slide.is-active{opacity:1;transform:scale(1)}
+
+.mastery-slide.mentor-1{background-image:url("images/mentor-1.jpg");background-position:50% 22%}
+.mastery-slide.mentor-2{background-image:url("images/mentor-2.jpg");background-position:50% 20%}
+.mastery-slide.mentor-3{background-image:url("images/mentor-3.jpg");background-position:50% 20%}
+.mastery-slide.mentor-4{background-image:url("images/mentor-4.jpg");background-position:50% 24%}
+.mastery-slide.mentor-5{background-image:url("images/mentor-5.jpg");background-position:50% 62%}
+
+.mastery-visual:after{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,transparent 50%,rgba(9,7,6,.72));
+}
+.mastery-visual .visual-light{
+  position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(220px circle at var(--x,50%) var(--y,50%),rgba(233,196,140,.22),transparent 62%);
+  opacity:0;transition:opacity .3s;
+}
+.mastery-visual:hover .visual-light{opacity:1}
+
+.mastery-caption{position:relative;z-index:3;padding:24px 26px;width:100%}
+.mastery-caption-name{
+  display:block;font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:500;
+  font-size:19px;color:var(--milk);margin-bottom:12px;
+}
+.mastery-dots{display:flex;gap:6px}
+.mastery-dots span{width:5px;height:5px;border-radius:50%;background:rgba(247,242,234,.35);transition:background .3s ease}
+.mastery-dots span.active{background:var(--rose)}
+
+@media (max-width:960px){
+  .mastery-slide.mentor-5{background-position:50% 72%}
+  .mastery-inner{grid-template-columns:1fr}
+  .mastery-text{order:1}
+  .mastery-visual{
+    position:-webkit-sticky;position:sticky;top:60px;
+    height:34vh;min-height:220px;order:0;margin-bottom:22px;z-index:1;
+  }
+  .mentors{flex-direction:column}
+  .mentor{border-right:none;border-bottom:1px solid rgba(247,242,234,.14);margin-right:0;padding:16px 0}
+  .mentor:last-child{border-bottom:none}
+}
+
+/* ===================== ВИТРИНА ===================== */
+.vitrina{background:var(--ink);padding:clamp(96px,13vw,170px) clamp(24px,7vw,100px)}
+.vitrina-inner{max-width:1320px;margin:0 auto}
+.vitrina .kicker-tag{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin-bottom:26px}
+.vitrina h2{font-weight:500;font-size:clamp(34px,4.8vw,64px);line-height:1;letter-spacing:-.02em;margin:0 0 56px}
+.vitrina h2 em{font-style:italic;color:var(--rose)}
+
+.grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:190px;gap:14px}
+.tile{
+  position:relative;overflow:hidden;border-radius:2px;color:var(--milk);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:transform var(--dur-micro) var(--ease-hover),box-shadow var(--dur-micro) var(--ease-hover);
+}
+.tile:hover{transform:translateY(-4px);box-shadow:0 24px 50px -20px rgba(0,0,0,.5)}
+
+/* carousel: stacked slides, one visible at a time. works fine with a single slide too */
+.tile-carousel{position:absolute;inset:0;cursor:zoom-in}
+.tile-slide{
+  position:absolute;inset:0;opacity:0;
+  transition:opacity .5s var(--ease-hover),transform .6s var(--ease-hover);
+  background-size:cover;background-position:center;
+}
+.tile-slide.is-active{opacity:1}
+.tile:hover .tile-slide.is-active{transform:scale(1.045)}
+
+/* light-background product photos sit inside a dark mat instead of full-bleed cover */
+.tile-framed .tile-carousel{background:linear-gradient(160deg,#221c14,#15110d 75%)}
+.tile-framed .tile-slide{background-size:contain;background-repeat:no-repeat;background-position:center}
+.tile-framed .tile-slide{filter:brightness(.96)}
+
+.tile-fade{position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(0,0,0,.62));pointer-events:none}
+.tile-label{position:relative;z-index:1;padding:22px;pointer-events:none}
+.tile-label span{display:block;font-family:Fraunces,Georgia,serif;font-size:19px;font-style:italic;margin-bottom:4px}
+.tile-label small{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;opacity:.72}
+
+.tile-dots{position:absolute;z-index:2;left:22px;bottom:64px;display:flex;gap:6px}
+.tile-dots span{width:5px;height:5px;border-radius:50%;background:rgba(247,242,234,.4);transition:background var(--dur-micro) var(--ease-hover)}
+.tile-dots span.active{background:var(--milk)}
+.tile-arrow{
+  position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:50%;
+  border:1px solid rgba(247,242,234,.35);background:rgba(9,7,6,.35);color:var(--milk);
+  display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;
+  opacity:0;transition:opacity var(--dur-micro) var(--ease-hover);
+}
+.tile:hover .tile-arrow{opacity:1}
+.tile-arrow-prev{left:12px}.tile-arrow-next{right:12px}
+
+.tile-bread{grid-column:span 2;grid-row:span 2}
+.tile-bread .tile-slide{filter:saturate(.94) contrast(1.05)}
+.tile-bread .bread-1{background-image:var(--img-bread);background-position:66% 42%}
+.tile-bread .bread-2{background-image:url("images/bread-2.jpg");background-position:50% 40%}
+.tile-bread .bread-3{background-image:url("images/bread-3.jpg");background-position:50% 45%}
+.tile-bread .bread-4{background-image:url("images/bread-4.jpg");background-position:50% 38%}
+
+.tile-cakes .tile-slide{filter:saturate(.96) contrast(1.05) brightness(.9)}
+.tile-cakes .cake-1{background-image:url("images/cake-1.jpg");background-position:60% 38%}
+.tile-cakes .cake-2{background-image:url("images/cake-2.jpg");background-position:50% 42%}
+.tile-cakes .cake-3{background-image:url("images/cake-3.jpg");background-position:50% 40%}
+.tile-cakes .cake-4{background-image:url("images/cake-4.jpg");background-position:50% 44%}
+.tile-cakes .cake-5{background-image:url("images/cake-5.jpg");background-position:50% 46%}
+.tile-cakes .cake-6{background-image:url("images/cake-6.jpg");background-position:50% 42%}
+.tile-desserts .tile-slide{
+  background-image:url("images/dessert.jpg");background-position:50% 30%;
+  filter:saturate(1.02) contrast(1.03) brightness(.9);
+}
+.tile-pastry .tile-slide{
+  background-size:cover;background-repeat:no-repeat;
+  filter:saturate(1) contrast(1.05) brightness(.92);
+}
+.tile-pastry .pastry-1{background-image:url("images/pastry-1.jpg");background-position:50% 45%}
+.tile-pastry .pastry-2{background-image:url("images/pastry-2.jpg");background-position:50% 48%}
+.tile-pastry .pastry-3{background-image:url("images/pastry-3.jpg");background-position:50% 40%}
+.tile-pies .tile-slide{
+  background-size:cover;background-repeat:no-repeat;
+  filter:saturate(1) contrast(1.05) brightness(.92);
+}
+.tile-pies .pie-1{background-image:url("images/pie-1.jpg");background-position:50% 42%}
+.tile-pies .pie-2{background-image:url("images/pie-2.jpg");background-position:50% 38%}
+.tile-pies .pie-3{background-image:url("images/pie-3.jpg");background-position:50% 40%}
+
+.tile-cakes:hover,.tile-desserts:hover{box-shadow:0 24px 50px -20px rgba(217,164,160,.22)}
+.tile-pastry:hover,.tile-pies:hover{box-shadow:0 24px 50px -20px rgba(183,154,106,.22)}
+
+/* lightbox: click any tile image to see it larger — dark canvas first, image slowly emerges on top */
+.lightbox{
+  position:fixed;inset:0;z-index:200;background:rgba(9,7,6,.92);
+  display:flex;align-items:center;justify-content:center;padding:40px;
+  opacity:0;pointer-events:none;transition:opacity .4s var(--ease-hover);
+}
+.lightbox.open{opacity:1;pointer-events:auto}
+.lightbox-frame{
+  position:relative;overflow:hidden;
+  width:min(80vw,760px);height:min(80vh,760px);
+  transform:scale(.96);transition:transform .5s var(--ease-reveal);
+  border:1px solid rgba(247,242,234,.14);
+}
+.lightbox.open .lightbox-frame{transform:scale(1)}
+.lightbox-canvas{position:absolute;inset:0;background:linear-gradient(160deg,#221c14,#15110d 75%)}
+.lightbox-img{
+  position:absolute;inset:0;
+  background-size:contain;background-repeat:no-repeat;background-position:center;
+  opacity:0;transform:scale(1.035);
+  transition:opacity .35s ease,transform .35s ease; /* fast — used when closing */
+}
+.lightbox.open .lightbox-img{
+  opacity:1;transform:scale(1);
+  /* slow, delayed reveal — canvas settles first, photo emerges after */
+  transition:opacity 2.3s .35s var(--ease-reveal),transform 2.4s .35s var(--ease-reveal);
+}
+.lightbox-close{
+  position:absolute;top:28px;right:clamp(24px,5vw,60px);width:40px;height:40px;border-radius:50%;
+  border:1px solid rgba(247,242,234,.3);background:transparent;color:var(--milk);font-size:16px;cursor:pointer;
+}
+.lightbox-nav{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:48px;height:48px;border-radius:50%;
+  border:1px solid rgba(247,242,234,.3);background:rgba(9,7,6,.4);color:var(--milk);
+  display:flex;align-items:center;justify-content:center;font-size:20px;line-height:1;cursor:pointer;
+  transition:background var(--dur-micro) var(--ease-hover);
+}
+.lightbox-nav:hover{background:rgba(9,7,6,.65)}
+.lightbox-prev{left:clamp(10px,3vw,36px)}
+.lightbox-next{right:clamp(10px,3vw,36px)}
+@media (max-width:640px){
+  .lightbox-nav{width:40px;height:40px;font-size:17px}
+}
+
+/* ===================== APP: intro text + animated phone (flip: back → front) ===================== */
+.app-transition{background:var(--ink2);padding:clamp(110px,15vw,180px) 24px;text-align:center;border-top:1px solid rgba(247,242,234,.06)}
+.app-transition h2{font-family:Fraunces,Georgia,serif;font-weight:500;font-style:italic;font-size:clamp(30px,4.2vw,52px);margin:0 0 18px}
+.app-transition p{font-size:15px;opacity:.72;max-width:460px;margin:0 auto 30px}
+.app-cta{display:inline-flex;align-items:center;gap:16px;text-decoration:none;color:var(--milk);font-size:13px;letter-spacing:.02em}
+.app-cta .line{width:80px;height:1px;background:currentColor;transition:width var(--dur-micro) var(--ease-hover)}
+.app-cta:hover .line{width:120px}
+.app-note{display:block;margin-top:26px;font-size:11px;letter-spacing:.06em;opacity:.5}
+
+.phone-scene{background:#0b0908;padding:clamp(80px,11vw,130px) 24px clamp(56px,7vw,80px);display:flex;justify-content:center}
+.phone{
+  width:min(230px,60vw);aspect-ratio:9/19.5;border-radius:34px;background:#000;
+  border:6px solid #1c1815;box-shadow:0 40px 90px -30px rgba(0,0,0,.75);
+  position:relative;perspective:1200px;overflow:hidden;cursor:pointer;
+  opacity:0;transform:translateY(24px) scale(.96);filter:brightness(0);
+  transition:opacity 2.6s var(--ease-cinematic),transform 2.6s var(--ease-cinematic),filter 2.6s var(--ease-cinematic);
+}
+.phone.active{opacity:1;transform:translateY(0) scale(1);filter:brightness(1)}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:44%;height:22px;background:#000;border-radius:0 0 14px 14px;z-index:4}
+
+.phone-flipper{
+  position:absolute;inset:0;
+  transform-style:preserve-3d;transform:rotateY(0deg);
+  transition:transform 2s var(--ease-cinematic);
+}
+.phone.active .phone-flipper{transition-delay:5.6s;transform:rotateY(180deg)}
+
+.phone-back,.phone-front{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:28px;overflow:hidden;
+}
+.phone-back{
+  background:
+    radial-gradient(circle at 35% 24%,rgba(255,255,255,.11),transparent 24%),
+    linear-gradient(145deg,#918c84 0%,#6e6962 28%,#49443d 58%,#26221d 100%);
+}
+.phone-front{
+  transform:rotateY(180deg);
+  background-image:url("images/app-screenshot.jpg");background-size:cover;background-position:center;
+  display:block;
+}
+
+/* Phone back: clean, camera-free product mockup */
+.phone-sweep{
+  position:absolute;top:0;bottom:0;width:38%;left:-60%;z-index:2;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.32) 45%,transparent 75%);
+  mix-blend-mode:screen;opacity:0;
+}
+.phone.active .phone-sweep{animation:phoneSweep 1.5s 2.8s ease-in-out forwards}
+@keyframes phoneSweep{
+  0%{opacity:0;left:-60%}
+  15%{opacity:1}
+  85%{opacity:1}
+  100%{opacity:0;left:130%}
+}
+
+.phone-mark{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:9px;height:9px;border-radius:50%;background:var(--milk);
+  opacity:.1;box-shadow:0 0 0 rgba(247,242,234,0);
+}
+.phone.active .phone-mark{animation:phoneMark 1.1s 4s ease-out forwards}
+@keyframes phoneMark{
+  0%{opacity:.1;box-shadow:0 0 0 rgba(247,242,234,0)}
+  100%{opacity:1;box-shadow:0 0 16px 2px rgba(247,242,234,.55)}
+}
+
+.phone-below{background:#0b0908;padding:0 24px clamp(120px,15vw,180px);text-align:center}
+.phone-below a{display:inline-flex;align-items:center;gap:16px;text-decoration:none;color:var(--milk);font-size:13px;letter-spacing:.02em}
+.phone-below .line{width:80px;height:1px;background:currentColor;transition:width var(--dur-micro) var(--ease-hover)}
+.phone-below a:hover .line{width:120px}
+.phone-below span{display:block;margin-top:22px;font-size:11px;letter-spacing:.06em;opacity:.5}
+
+@media (max-width:860px){
+  .grid{grid-template-columns:repeat(2,1fr);grid-auto-rows:170px}
+  .tile-bread{grid-column:span 2;grid-row:span 2}
+  .tile-arrow{opacity:1}
+}
+
+/* ===================== ЗАКАЗ (CTA) ===================== */
+.order-cta{background:var(--ink2);padding:clamp(110px,15vw,190px) clamp(24px,7vw,100px);text-align:center}
+.order-inner{max-width:640px;margin:0 auto}
+.order-cta .kicker-tag{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin-bottom:26px}
+.order-cta h2{font-weight:500;font-size:clamp(34px,5vw,60px);line-height:1.02;letter-spacing:-.02em;margin:0 0 22px}
+.order-cta .lead{font-size:15px;line-height:1.7;opacity:.72;margin:0 0 44px}
+.order-actions{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.btn-primary,.btn-ghost{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:16px 30px;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none;
+  transition:background var(--dur-micro) var(--ease-hover),opacity var(--dur-micro) var(--ease-hover),border-color var(--dur-micro) var(--ease-hover);
+}
+.btn-primary{background:var(--milk);color:var(--ink)}
+.btn-primary:hover{background:#fff}
+.btn-ghost{border:1px solid rgba(247,242,234,.35);color:var(--milk)}
+.btn-ghost:hover{border-color:rgba(247,242,234,.7)}
+
+/* ===================== КОНТАКТЫ ===================== */
+.contacts{background:var(--ink);padding:clamp(96px,13vw,170px) clamp(24px,7vw,100px);border-top:1px solid rgba(247,242,234,.08)}
+.contacts-inner{max-width:1080px;margin:0 auto}
+.contacts .kicker-tag{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass);margin-bottom:26px}
+.contacts h2{font-weight:500;font-size:clamp(32px,4.4vw,54px);line-height:1.06;letter-spacing:-.02em;margin:0 0 clamp(56px,7vw,90px)}
+
+.contacts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(28px,4vw,56px);border-top:1px solid rgba(247,242,234,.14);padding-top:44px}
+.contact-item{display:flex;gap:16px;align-items:flex-start}
+.contact-item b{display:block;font-family:Fraunces,Georgia,serif;font-weight:500;font-size:16px;margin-bottom:10px;color:var(--milk)}
+.contact-item a,.contact-line{display:block;font-size:14px;line-height:1.9;color:var(--milk);opacity:.76;text-decoration:none}
+.contact-item a:hover{opacity:1}
+
+.contact-pin{
+  flex:0 0 auto;width:9px;height:9px;margin-top:7px;border-radius:50%;
+  background:var(--brass);position:relative;
+}
+.contact-pin i{
+  position:absolute;inset:-7px;border-radius:50%;border:1px solid var(--brass);
+  opacity:0;animation:pinPulse 2.8s ease-out infinite;
+}
+.contact-item:nth-child(2) .contact-pin i{animation-delay:.5s}
+.contact-item:nth-child(3) .contact-pin i{animation-delay:1s}
+@keyframes pinPulse{
+  0%{opacity:.55;transform:scale(.4)}
+  70%{opacity:0;transform:scale(1.6)}
+  100%{opacity:0;transform:scale(1.6)}
+}
+
+@media (max-width:760px){
+  .contacts-grid{grid-template-columns:1fr;gap:34px}
+}
+
+/* ===================== FOOTER ===================== */
+footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:60px clamp(24px,7vw,100px) 40px}
+.footer-inner{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:34px}
+.footer-links{display:flex;flex-wrap:wrap;gap:24px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+.footer-links a{text-decoration:none;color:var(--milk);transition:opacity var(--dur-micro) var(--ease-hover)}
+.footer-links a:hover{opacity:1}
+.footer-meta{display:flex;gap:28px;font-size:12px;opacity:.55;flex-wrap:wrap}
+.footer-bottom{border-top:1px solid rgba(247,242,234,.08);padding-top:24px;font-size:11px;opacity:.4}
+
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation:none!important;transition:none!important}
+  .visual{opacity:1}
+  [data-reveal]{opacity:1!important;transform:none!important}
+}
+
+
+/* ============================================================
+   MOBILE ART DIRECTION — 360–600 px
+   Отдельная мобильная композиция: не уменьшенная desktop-версия,
+   а самостоятельная вертикальная сцена с короткими ритмами,
+   крупной типографикой и безопасными touch-зонами.
+   ============================================================ */
+@media (max-width:600px){
+  html{overflow-x:hidden;scroll-behavior:smooth}
+  body{overflow-x:hidden;min-width:0}
+  #siteNav{
+    height:58px;
+    padding:0 18px;
+    justify-content:flex-end;
+    background:linear-gradient(180deg,rgba(16,13,11,.52),transparent);
+    border:0;
+    animation:none;
+    opacity:1;
+  }
+  #siteNav.scrolled{
+    background:rgba(23,20,17,.86);
+    border-bottom:1px solid rgba(247,242,234,.08);
+  }
+  .nav-app{position:static;font-size:9px;letter-spacing:.1em;padding:12px 0}
+
+  /* HERO */
+  .hero{height:100svh;min-height:680px;max-height:900px}
+  .visual,.patch{background-attachment:scroll!important;background-position:67% 43%}
+  .visual:after{
+    background:
+      linear-gradient(180deg,rgba(23,20,17,.12) 0%,rgba(23,20,17,.18) 42%,rgba(23,20,17,.78) 77%,rgba(23,20,17,.96) 100%),
+      radial-gradient(circle at 70% 40%,rgba(215,155,79,.1),transparent 34%);
+  }
+  .visual-patches{opacity:.55}
+  .content{left:18px;right:18px;bottom:72px;top:auto;width:auto;transform:none}
+  .brand{width:132px;margin-bottom:25px}
+  .kicker-line{font-size:9px;letter-spacing:.14em;line-height:1.5;margin-bottom:15px}
+  .hero h1{font-size:clamp(42px,12.2vw,54px);line-height:.94;letter-spacing:-.035em;max-width:350px;margin-bottom:18px}
+  .categories{font-size:9px;letter-spacing:.12em;margin-bottom:0}
+  .progress{left:18px;right:auto;bottom:22px;font-size:9px}
+  .progress i{width:42px}
+  .scroll-hint{display:none}
+  .cursor-light{display:none}
+
+  /* MANIFESTO — один экран без пустого чёрного хвоста между разделами */
+  .manifesto{height:100svh;min-height:0}
+  .manifesto-inner{height:100svh;position:relative}
+  .texture{inset:-12%;background-position:58% 45%;filter:brightness(.38) saturate(.82) contrast(1.06)}
+  .manifesto-line{padding:20px 22px}
+  .manifesto-line p{font-size:clamp(29px,8.4vw,37px);line-height:1.1;max-width:340px}
+  #manifestoLine2 p:first-child{font-size:clamp(25px,7.4vw,32px)}
+  .manifesto-line .manifesto-sub{font-size:13px;line-height:1.65;max-width:310px;margin-top:17px}
+
+  /* PEOPLE */
+  .people{min-height:760px;display:block}
+  .people-photo{background-position:62% 18%;filter:brightness(.52) saturate(.86) blur(4px)}
+  .people-photo.reveal{filter:brightness(.62) saturate(.95) blur(0)}
+  .people-photo:after{background:linear-gradient(180deg,rgba(9,7,6,.08) 12%,rgba(9,7,6,.28) 38%,rgba(9,7,6,.96) 86%)}
+  .people-text{padding:0 20px 54px;position:absolute;left:0;right:0;bottom:0;max-width:none}
+  .people-lead{font-size:31px;line-height:1.05;margin-bottom:18px}
+  .people-text p{font-size:14px;line-height:1.72;margin-bottom:18px}
+  .people-quote{font-size:20px!important;line-height:1.25!important;padding-top:18px;margin-top:2px!important}
+
+  /* CRAFT */
+  .craft{padding:78px 20px 92px}
+  .craft-inner{display:flex;flex-direction:column;gap:0}
+  .craft-visual{
+    position:relative!important;top:auto!important;order:0;height:58svh;min-height:350px;max-height:520px;
+    margin:0 -20px 48px;z-index:1;border-left:0;border-right:0;
+  }
+  .craft-text{order:1}
+  .craft .kicker,.mastery .kicker{font-size:9px;letter-spacing:.2em;gap:12px;margin-bottom:20px}
+  .craft .kicker i,.mastery .kicker i{width:28px}
+  .craft h2,.mastery h2{font-size:clamp(37px,10.5vw,48px);line-height:.98;margin-bottom:22px}
+  .craft .lead,.mastery .lead{font-size:14px;line-height:1.72;margin-bottom:46px}
+  .stats{grid-template-columns:1fr 1fr;gap:0;margin-bottom:72px}
+  .stat{padding:22px 12px 22px 0}
+  .stat:nth-child(n+3){border-top:1px solid rgba(247,242,234,.14)}
+  .stat b{font-size:36px;margin-bottom:10px}
+  .stat span{font-size:11px;line-height:1.5;max-width:145px}
+  .blocks{gap:30px;margin-bottom:76px}
+  .block h3{font-size:24px;line-height:1.05;margin-bottom:15px}
+  .block p{font-size:13.5px;line-height:1.75}
+  .closer{padding-top:38px}
+  .closer p{font-size:21px;line-height:1.32}
+
+  /* DESSERT TRANSITION — компактный мост, без пустого чёрного экрана */
+  .dessert-transition{background:var(--ink)!important;padding:58px 20px 64px!important;min-height:0!important;text-align:center}
+  .dessert-transition p{font-size:32px!important;line-height:1.05!important;margin:0}
+  .dessert-transition .dessert-transition-sub{font-size:13px!important;line-height:1.6!important;max-width:290px;margin-top:16px!important}
+
+  /* MASTERY MANIFESTO — один экран без пустого чёрного хвоста перед Мастерством */
+  .mastery-manifesto{height:100svh;min-height:0}
+  .mastery-manifesto-inner{height:100svh;position:relative}
+  .mastery-texture{inset:0!important;background-position:50% 50%!important;background-size:cover!important;transform:scale(1)!important}
+  .mastery-manifesto h2{padding:0 20px;font-size:clamp(38px,10.8vw,50px);line-height:.98;text-align:center}
+
+  /* MASTERY */
+  .mastery{padding:76px 20px 92px}
+  .mastery-inner{display:flex;flex-direction:column;gap:0}
+  .mastery-visual{
+    position:relative!important;top:auto!important;order:0;height:62svh;min-height:380px;max-height:560px;
+    margin:0 -20px 46px;border-left:0;border-right:0;
+  }
+  .mastery-text{order:1}
+  .mastery-slide{background-position:50% 42%!important}
+  .mastery-slide.mentor-5{background-position:50% 40%!important}
+  .mastery-caption{padding:18px 20px}
+  .mastery-caption-name{font-size:18px;margin-bottom:9px}
+  .mastery .lead{margin-bottom:38px}
+  .mentors{margin-bottom:70px}
+  .mentor{padding:15px 0}
+  .mentor b{font-size:17px}
+  .mentor span{font-size:9px}
+  .mastery .blocks{gap:30px;margin-bottom:72px}
+  .mastery .closer{padding-top:38px}
+  .signature-line{width:180px}
+
+  /* ABOUT */
+  .about{padding:82px 20px 96px!important}
+  .about h2{font-size:clamp(34px,9.6vw,45px)!important;line-height:1!important;margin-bottom:22px!important}
+  .about .lead{font-size:14px!important;line-height:1.72!important;margin-bottom:52px!important}
+  .pillars{display:block!important}
+  .pillar{padding:22px 0!important;border-top:1px solid rgba(247,242,234,.14)!important}
+  .pillar h3{font-size:24px!important;margin-bottom:10px!important}
+  .pillar p{font-size:13px!important;line-height:1.72!important}
+  .founders{display:block!important;margin-top:50px!important}
+  .founders-photo{height:360px!important}
+  .founders-text{padding:18px 0 0!important;font-size:13px!important;line-height:1.7!important}
+  .quote{padding:34px 0 0!important}
+  .quote p{font-size:27px!important;line-height:1.08!important}
+
+  /* VITRINA — one strong image per row */
+  .vitrina{padding:82px 20px 96px}
+  .vitrina h2{font-size:40px;margin-bottom:34px}
+  .grid{grid-template-columns:1fr;grid-auto-rows:auto;gap:10px}
+  .tile,.tile-bread,.tile-cakes,.tile-desserts,.tile-pastry,.tile-pies{grid-column:auto;grid-row:auto;height:62svh;min-height:350px;max-height:540px}
+  .tile-label{padding:20px!important}
+  .tile-label span{font-size:25px!important}
+  .tile-label small{font-size:10px!important}
+  .tile-arrow{width:40px!important;height:40px!important}
+  .tile-dots{bottom:18px!important}
+
+  /* LIGHTBOX */
+  .lightbox-frame{width:calc(100vw - 24px)!important;height:calc(100svh - 100px)!important}
+  .lightbox-nav{width:38px!important;height:38px!important}
+  .lightbox-close{top:14px!important;right:14px!important}
+
+  /* APP — clean phone, no camera/notch details */
+  .app-transition{padding:82px 20px 70px}
+  .app-transition h2{font-size:32px;line-height:1.05}
+  .app-transition p{font-size:14px;line-height:1.7}
+  .phone-scene{padding:60px 20px 46px}
+  .phone{width:min(214px,58vw);border-radius:30px;border-width:5px}
+  .phone-notch,.phone-mark{display:none!important}
+  .phone-back,.phone-front{border-radius:25px}
+  .phone-below{padding:0 20px 92px}
+  .phone-below a{font-size:12px}
+
+  /* ORDER */
+  .order-cta{padding:88px 20px 100px}
+  .order-cta h2{font-size:39px;line-height:1.02}
+  .order-cta .lead{font-size:14px;line-height:1.7;margin-bottom:32px}
+  .order-actions{display:block}
+  .btn-primary,.btn-ghost{width:100%;min-height:52px;padding:15px 18px}
+
+  /* CONTACTS / FOOTER */
+  .contacts{padding:80px 20px 88px}
+  .contacts h2{font-size:39px;line-height:1.02;margin-bottom:48px}
+  .contacts-grid{gap:28px;padding-top:30px}
+  .contact-item{gap:13px}
+  .contact-item a,.contact-line{font-size:13px;line-height:1.8}
+  footer{padding:48px 20px 28px}
+  .footer-inner{gap:28px}
+  .footer-links{display:grid;grid-template-columns:1fr 1fr;gap:15px 20px;font-size:9px}
+  .footer-meta{display:block;font-size:10px;line-height:1.8}
+  .footer-meta span{display:block}
+  .footer-bottom{font-size:9px;line-height:1.5}
+}
+
+@media (max-width:380px){
+  .hero h1{font-size:40px}
+  .manifesto-line p{font-size:27px}
+  .craft h2,.mastery h2,.about h2,.order-cta h2,.contacts h2{font-size:35px!important}
+  .tile,.tile-bread,.tile-cakes,.tile-desserts,.tile-pastry,.tile-pies{height:58svh;min-height:320px}
+}
+
+</style>
+</head>
+<body>
+
+<nav id="siteNav">
+  <div class="navlinks">
+    <a href="#craft">Хлеб</a><a href="#mastery">Кондитерская</a><a href="#vitrina">Витрина</a>
+    <a href="#about">О нас</a><a href="#contacts">Контакты</a><a href="#order">Заказ</a>
+  </div>
+  <a class="nav-app" href="https://vslast-premium.web.app" target="_blank" rel="noopener">Открыть PWA-приложение ↗</a>
+</nav>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="hero">
+  <div class="visual-base"></div>
+  <div class="visual-patches">
+    <span class="patch p1"></span><span class="patch p2"></span><span class="patch p3"></span>
+    <span class="patch p4"></span><span class="patch p5"></span><span class="patch p6"></span><span class="patch p7"></span>
+  </div>
+  <div class="visual" id="heroVisual"></div>
+  <div class="light"></div>
+  <div class="steam-glow"></div>
+  <div class="cursor-light" id="cursorLight"></div>
+
+  <div class="content" id="heroContent">
+    <img class="brand" src="images/logo.png" alt="Всласть — пекарня и кондитерская">
+    <div class="kicker-line">Ремесленная пекарня и кондитерская</div>
+    <h1>Вкус, которому<br>нужно время.</h1>
+    <div class="categories">Нижневартовск</div>
+  </div>
+
+  <div class="scroll-hint">Узнать «Всласть» ↓</div>
+</section>
+
+<section class="manifesto" id="manifesto">
+  <div class="manifesto-inner">
+    <div class="texture" id="texture"></div>
+    <div class="manifesto-line" id="manifestoLine1"><p>Мы не торопим вкус.</p></div>
+    <div class="manifesto-line" id="manifestoLine2">
+      <p>Хлебу нужно время.<br>Тесту нужно время.</p>
+      <p class="manifesto-sub">Нам понадобились годы, чтобы научиться делать то, что нам нравится самим.</p>
+    </div>
+    <div class="manifesto-line" id="manifestoLine3"><p>Поэтому «Всласть» — это не просто пекарня.</p></div>
+  </div>
+</section>
+
+<!-- ===================== ЛЮДИ ===================== -->
+<section class="people" id="people">
+  <div class="people-photo" data-reveal>
+    <div class="people-grain"></div>
+  </div>
+  <div class="people-text" data-reveal>
+    <p class="people-lead">Мы — Сергей и Оксана.</p>
+    <p>В 2023 году мы открыли «Всласть» в Нижневартовске. Нам хотелось делать здесь настоящий хлеб, красивые десерты и просто хорошие продукты — без попытки сделать быстрее, дешевле или проще.</p>
+    <p class="people-quote">Мы делаем так, как хотели бы, чтобы делали для нас.</p>
+  </div>
+</section>
+
+<!-- ===================== РЕМЕСЛО ===================== -->
+<section class="craft" id="craft">
+  <div class="craft-bg" id="craftBg"></div>
+  <div class="craft-inner">
+    <div class="craft-text">
+
+      <div class="kicker" data-reveal><i></i>Ремесло</div>
+      <h2 data-reveal>Хлеб, на который<br>уходят <em>сутки.</em></h2>
+      <p class="lead" data-reveal>
+        В промышленном тесте дрожжи работают час-полтора. В нашем — от суток и больше.
+        За это время закваска делает то, что никаким улучшителем не заменить: медленно
+        раскрывает вкус муки и меняет саму структуру теста ещё до того, как оно попадёт в печь.
+      </p>
+
+      <div class="stats">
+        <div class="stat" data-reveal><b>24+</b><span>часа холодной ферментации теста перед выпечкой</span></div>
+        <div class="stat" data-reveal><b>4</b><span>ингредиента без исключений: мука, вода, соль, закваска</span></div>
+        <div class="stat" data-reveal><b>0</b><span>улучшителей, эмульгаторов и консервантов в составе</span></div>
+        <div class="stat" data-reveal><b>с 2023</b><span>наша закваска живёт столько же, сколько пекарня</span></div>
+      </div>
+
+      <div class="blocks">
+        <div class="block" data-reveal>
+          <h3>Почему закваска, а не дрожжи</h3>
+          <p>Закваска — это симбиоз диких дрожжей и молочнокислых бактерий, который живёт
+          на муке веками. За время долгой ферментации они расщепляют
+          <strong>фитиновую кислоту</strong> в оболочке зерна — ту самую, что мешает
+          усвоению железа, цинка и магния — и буквально открывают организму минералы муки.</p>
+          <p>Молочная и уксусная кислоты, которые вырабатывает закваска, замедляют скорость
+          усвоения крахмала — отсюда более плавный отклик, чем у быстрого дрожжевого хлеба.
+          Та же кислая среда естественно консервирует мякиш: плесени в ней просто плохо живётся,
+          без единого добавленного консерванта.</p>
+        </div>
+        <div class="divider"></div>
+        <div class="block" data-reveal>
+          <h3>Что мы сознательно не используем</h3>
+          <p>Индустриальный хлеб почти всегда держится не на времени, а на технологических
+          добавках: <strong>улучшители</strong> для ускоренного подъёма, эмульгаторы для
+          «воздушности», ферментные препараты, аскорбиновая кислота как окислитель — а иногда
+          и сахар, просто чтобы дрожжи успели сработать за отведённый час.</p>
+          <p>В нашем процессе всё это избыточно. Улучшитель не нужен, если тесту дали вызреть.
+          Консервант не нужен, если кислотность закваски и так защищает хлеб. Эмульгатор
+          не нужен, если клейковина муки успела развиться сама — через время и обминку,
+          а не через химию.</p>
+        </div>
+      </div>
+
+      <div class="closer" data-reveal>
+        <p>Мы не ускоряем хлеб. <em>Мы просто не мешаем времени работать.</em></p>
+      </div>
+
+    </div>
+
+    <div class="craft-visual" id="craftVisual" data-reveal>
+      <div class="visual-img"></div>
+      <div class="visual-light" id="visualLight"></div>
+      <div class="ring-wrap">
+        <svg width="60" height="60" viewBox="0 0 60 60">
+          <circle class="ring-track" cx="30" cy="30" r="27"/>
+          <circle class="ring-fill" id="ringFill" cx="30" cy="30" r="27"/>
+        </svg>
+        <div>
+          <div class="ring-num" id="ringNum">0</div>
+          <div class="ring-label">часов ферментации</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ПЕРЕХОД К ДЕСЕРТАМ ===================== -->
+<section class="dessert-transition" id="dessertTransition">
+  <p data-reveal>А десерт?</p>
+  <p class="dessert-transition-sub" data-reveal>Для него времени нужно ещё больше.</p>
+</section>
+
+<!-- ===================== МАСТЕРСТВО ===================== -->
+<section class="mastery-manifesto" id="masteryManifesto">
+  <div class="mastery-manifesto-inner">
+    <div class="mastery-texture" id="masteryTexture"></div>
+    <h2 id="masteryManifestoText">Десерты,<br>которым мы <em>учились годами.</em></h2>
+  </div>
+</section>
+
+<section class="mastery" id="mastery">
+  <div class="mastery-inner">
+
+    <div class="mastery-visual" id="masteryVisual" data-reveal>
+      <div class="mastery-slide mentor-1 is-active"></div>
+      <div class="mastery-slide mentor-2"></div>
+      <div class="mastery-slide mentor-3"></div>
+      <div class="mastery-slide mentor-4"></div>
+      <div class="mastery-slide mentor-5"></div>
+      <div class="visual-light" id="masteryLight"></div>
+      <div class="mastery-caption">
+        <span class="mastery-caption-name" id="masteryCaptionName">GaruHaru</span>
+        <div class="mastery-dots" id="masteryDots"></div>
+      </div>
+    </div>
+
+    <div class="mastery-text">
+
+      <div class="kicker" data-reveal><i></i>Мастерство</div>
+      <h2 data-reveal>Десерты, на которые<br><em>ушли годы.</em></h2>
+      <p class="lead" data-reveal>
+        Оксана училась не на одном мастер-классе ради вдохновения — а последовательно,
+        у нескольких кондитеров с мировым именем. Технику нужно было повторить сотни раз,
+        прежде чем она стала своей.
+      </p>
+
+      <div class="mentors">
+        <div class="mentor" data-reveal><b>GaruHaru</b><span>Мастер-класс</span></div>
+        <div class="mentor" data-reveal><b>Hans Ovando</b><span>Мастер-класс</span></div>
+        <div class="mentor" data-reveal><b>Gregory Doyen</b><span>Мастер-класс</span></div>
+        <div class="mentor" data-reveal><b>Вера Никандрова</b><span>Мастер-класс</span></div>
+        <div class="mentor" data-reveal><b>Мария Селянина</b><span>Мастер-класс</span></div>
+        <div class="mentor" data-reveal><b>Enric Monzonis</b><span>Мастер-класс</span></div>
+      </div>
+
+      <div class="blocks">
+        <div class="block" data-reveal>
+          <h3>Школа, а не вдохновение</h3>
+          <p>Между «увидеть» и «уметь» — сотни повторений. Каждый мастер передавал свою
+          часть ремесла: <strong>архитектуру</strong> десерта, баланс текстур, точность
+          температуры и работы с шоколадом.</p>
+          <p>Это не вдохновение на один пост в соцсетях — это техника, которая остаётся
+          на всю жизнь и повторяется одинаково точно каждый раз, а не по настроению.</p>
+        </div>
+        <div class="divider"></div>
+        <div class="block" data-reveal>
+          <h3>Что это значит для вас</h3>
+          <p>Рецепт в нашей кондитерской — не эксперимент над гостем. Баланс сладости,
+          кислотности и текстуры выверен заранее той самой <strong>выученной техникой</strong>,
+          а не интуицией здесь и сейчас.</p>
+          <p>Поэтому один и тот же десерт на вкус одинаково хорош и в первый, и в сотый раз,
+          когда вы его заказываете.</p>
+        </div>
+      </div>
+
+      <div class="closer signature" data-reveal>
+        <p>Хороший десерт нельзя угадать. <em>Ему нужно научиться.</em></p>
+        <svg class="signature-line" width="220" height="28" viewBox="0 0 220 28" fill="none">
+          <path d="M4 18C24 4 40 4 54 14C70 26 86 26 100 14C116 2 132 2 148 14C164 26 180 26 196 12C204 6 210 6 216 10"
+                stroke="var(--rose)" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===================== О НАС ===================== -->
+<section class="about" id="about">
+  <div class="about-inner">
+    <div class="kicker-tag" data-reveal>О нас</div>
+    <h2 data-reveal>Пекарня, которая началась<br>с одной печи в Нижневартовске.</h2>
+    <p class="lead" data-reveal>
+      Мы открылись в 2023 году с простой мысли: ремесленный хлеб и десерты по-настоящему
+      европейского уровня нужны не только в столицах. Дальше — просто ежедневная дисциплина:
+      печь то же самое, что пекли бы для себя.
+    </p>
+
+    <div class="pillars">
+      <div class="pillar" data-reveal>
+        <h3>Хлеб</h3>
+        <p>Мы учимся у традиции долгой ферментации — той, что в разное время
+        исследовали такие мастера, как Людовик Ришар и Джеффри Хамельман. Для нас
+        это не имена из учебника, а метод: время важнее скорости.</p>
+      </div>
+      <div class="pillar" data-reveal>
+        <h3>Кондитерская</h3>
+        <p>В десертах — та же дисциплина, что в современной архитектурной кондитерской:
+        чистые формы, точный баланс сладости и кислотности, вдохновлённые направлением
+        GaruHaru, Ханса Ованду, Грегори Дуайена и Марии Селяниной.</p>
+      </div>
+      <div class="pillar" data-reveal>
+        <h3>Люди</h3>
+        <p>Небольшая команда, которая печёт каждый день. Никакого конвейера —
+        только повторяемая ремесленная дисциплина и внимание к деталям, которые
+        не видно на фото, но чувствуется на вкус.</p>
+      </div>
+    </div>
+
+    <div class="founders" data-reveal>
+      <div class="founders-photo"></div>
+      <div class="founders-text">
+        <b>Сергей и Оксана — основатели пекарни</b>
+        Мы верим, что честный продукт не нуждается в объяснениях — только во времени
+        на то, чтобы его приготовить правильно. Это единственное, чем мы не готовы жертвовать.
+      </div>
+    </div>
+
+    <div class="quote" data-reveal>
+      <p>Мы не спешим — и в этом весь секрет.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ВИТРИНА ===================== -->
+<section class="vitrina" id="vitrina">
+  <div class="vitrina-inner">
+    <div class="kicker-tag" data-reveal>Витрина</div>
+    <h2 data-reveal>Наша <em>продукция</em></h2>
+
+    <div class="grid">
+      <div class="tile tile-bread" data-reveal>
+        <div class="tile-carousel">
+          <div class="tile-slide bread-1 is-active"></div>
+          <div class="tile-slide bread-2"></div>
+          <div class="tile-slide bread-3"></div>
+          <div class="tile-slide bread-4"></div>
+        </div>
+        <div class="tile-fade"></div>
+        <div class="tile-label"><span>Хлеб</span><small>Ремесленный, на закваске</small></div>
+      </div>
+      <div class="tile tile-cakes" data-reveal>
+        <div class="tile-carousel">
+          <div class="tile-slide cake-1 is-active"></div>
+          <div class="tile-slide cake-2"></div>
+          <div class="tile-slide cake-3"></div>
+          <div class="tile-slide cake-4"></div>
+          <div class="tile-slide cake-5"></div>
+          <div class="tile-slide cake-6"></div>
+        </div>
+        <div class="tile-fade"></div>
+        <div class="tile-label"><span>Торты</span></div>
+      </div>
+      <div class="tile tile-desserts" data-reveal>
+        <div class="tile-carousel">
+          <div class="tile-slide is-active"></div>
+        </div>
+        <div class="tile-fade"></div>
+        <div class="tile-label"><span>Десерты</span></div>
+      </div>
+      <div class="tile tile-pastry" data-reveal>
+        <div class="tile-carousel">
+          <div class="tile-slide pastry-1 is-active"></div>
+          <div class="tile-slide pastry-2"></div>
+          <div class="tile-slide pastry-3"></div>
+        </div>
+        <div class="tile-fade"></div>
+        <div class="tile-label"><span>Выпечка</span></div>
+      </div>
+      <div class="tile tile-pies" data-reveal>
+        <div class="tile-carousel">
+          <div class="tile-slide pie-1 is-active"></div>
+          <div class="tile-slide pie-2"></div>
+          <div class="tile-slide pie-3"></div>
+        </div>
+        <div class="tile-fade"></div>
+        <div class="tile-label"><span>Пироги и галеты</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <button class="lightbox-nav lightbox-prev" id="lightboxPrev" type="button">‹</button>
+  <button class="lightbox-nav lightbox-next" id="lightboxNext" type="button">›</button>
+  <div class="lightbox-frame" id="lightboxFrame">
+    <div class="lightbox-canvas"></div>
+    <div class="lightbox-img" id="lightboxImg"></div>
+  </div>
+</div>
+
+<!-- ===================== APP: витрина в приложении + анимированный телефон ===================== -->
+<section class="app-transition" id="app">
+  <h2 data-reveal>А дальше — попробуйте.</h2>
+  <p data-reveal>Вся сегодняшняя витрина — хлеб, десерты, торты, выпечка и пироги — доступна в приложении «Всласть», и обновляется каждый день.</p>
+</section>
+
+<section class="phone-scene">
+  <div class="phone" id="phoneMock" role="button" tabindex="0" aria-label="Открыть приложение «Всласть»">
+    <div class="phone-notch"></div>
+    <div class="phone-flipper" id="phoneFlipper">
+      <div class="phone-back">
+        <div class="phone-sweep"></div>
+        <div class="phone-mark"></div>
+      </div>
+      <div class="phone-front"></div>
+    </div>
+  </div>
+</section>
+
+<div class="phone-below">
+  <a class="app-cta" data-reveal href="https://vslast-premium.web.app" target="_blank" rel="noopener">Открыть приложение <span class="line"></span>→</a>
+  <span class="app-note" data-reveal>Заказать можно прямо из приложения</span>
+</div>
+
+
+
+<!-- ===================== ЗАКАЗ ===================== -->
+<section class="order-cta" id="order">
+  <div class="order-inner">
+    <div class="kicker-tag" data-reveal>Заказ</div>
+    <h2 data-reveal>Хлеб и десерты, которые стоит ждать,<br>чтобы насладиться.</h2>
+    <p class="lead" data-reveal>Свежая витрина — в приложении и в пекарне в Нижневартовске, каждый день.</p>
+    <div class="order-actions" data-reveal>
+      <a class="btn-primary" href="https://vslast-premium.web.app" target="_blank" rel="noopener">Открыть PWA-приложение</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== КОНТАКТЫ ===================== -->
+<section class="contacts" id="contacts">
+  <div class="contacts-inner">
+    <div class="kicker-tag" data-reveal>Контакты</div>
+    <h2 data-reveal>Пекарня в Нижневартовске.<br>Ждём вас.</h2>
+
+    <div class="contacts-grid">
+      <div class="contact-item" data-reveal>
+        <span class="contact-pin"><i></i></span>
+        <div>
+          <b>Адрес</b>
+          <a href="https://yandex.ru/maps/?text=Нижневартовск%20ул.%20Пионерская%2012" target="_blank" rel="noopener">
+            Нижневартовск, ул. Пионерская, 12
+          </a>
+        </div>
+      </div>
+
+      <div class="contact-item" data-reveal>
+        <span class="contact-pin"><i></i></span>
+        <div>
+          <b>Телефон</b>
+          <a href="tel:+79129399754">+7 912 939-97-54</a>
+          <a href="tel:+79224042872">+7 922 404-28-72</a>
+        </div>
+      </div>
+
+      <div class="contact-item" data-reveal>
+        <span class="contact-pin"><i></i></span>
+        <div>
+          <b>Часы работы</b>
+          <span class="contact-line">Вт–Пт · 11:00–19:00</span>
+          <span class="contact-line">Сб · 11:00–16:00</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="#craft">Хлеб</a><a href="#mastery">Кондитерская</a><a href="#vitrina">Витрина</a>
+      <a href="#about">О нас</a><a href="#contacts">Контакты</a><a href="#order">Заказ</a>
+    </div>
+    <div class="footer-meta"><span>Нижневартовск, ул. Пионерская, 12</span><span>Вт–Пт 11:00–19:00 · Сб 11:00–16:00</span></div>
+    <div class="footer-bottom">© 2026 Всласть — пекарня и кондитерская</div>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   MOTION CORE — общие хелперы для scroll-reveal и курсорного света.
+   Любая новая секция подключается через эти же три функции,
+   а не копирует свой собственный IntersectionObserver/pointermove.
+   ============================================================ */
+const Motion = (() => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function reveal(selector, {stagger = 0} = {}) {
+    const els = document.querySelectorAll(selector);
+    if (reduceMotion) { els.forEach(el => el.classList.add('reveal')); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const idx = stagger ? Array.from(el.parentElement.children).indexOf(el) : 0;
+          setTimeout(() => el.classList.add('reveal'), idx * stagger);
+          io.unobserve(el);
+        }
+      });
+    }, {threshold: .25, rootMargin: '0px 0px -8% 0px'});
+    els.forEach(el => io.observe(el));
+  }
+
+  function cursorLight(container, light) {
+    if (reduceMotion || !container || !light) return;
+    container.addEventListener('pointermove', e => {
+      const r = container.getBoundingClientRect();
+      light.style.setProperty('--x', ((e.clientX - r.left) / r.width * 100).toFixed(1) + '%');
+      light.style.setProperty('--y', ((e.clientY - r.top) / r.height * 100).toFixed(1) + '%');
+    });
+  }
+
+  function scrollProgress(el) {
+    const rect = el.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const total = el.offsetHeight - vh;
+    return total > 0 ? Math.min(Math.max(-rect.top / total, 0), 1) : 0;
+  }
+
+  return {reveal, cursorLight, scrollProgress, reduceMotion};
+})();
+
+/* ---------- global nav: solidifies once hero is scrolled past ---------- */
+const siteNav = document.querySelector('#siteNav');
+window.addEventListener('scroll', () => {
+  siteNav.classList.toggle('scrolled', window.scrollY > window.innerHeight * .82);
+}, {passive: true});
+
+/* ---------- HERO: bespoke opening choreography (signature moment, not tokenised) ---------- */
+const hero = document.querySelector('#hero');
+const heroVisual = document.querySelector('#heroVisual');
+const heroContent = document.querySelector('#heroContent');
+const heroLight = document.querySelector('#cursorLight');
+const manifesto = document.querySelector('#manifesto');
+const texture = document.querySelector('#texture');
+const manifestoLine1 = document.querySelector('#manifestoLine1');
+const manifestoLine2 = document.querySelector('#manifestoLine2');
+const manifestoLine3 = document.querySelector('#manifestoLine3');
+
+hero.addEventListener('pointermove', e => {
+  const r = hero.getBoundingClientRect();
+  heroLight.style.left = (e.clientX - r.left) + 'px';
+  heroLight.style.top = (e.clientY - r.top) + 'px';
+  heroLight.style.opacity = '.9';
+});
+hero.addEventListener('pointerleave', () => heroLight.style.opacity = '0');
+
+let timeScale = 1;
+const heroStart = performance.now();
+function heroTick(now) {
+  const t = Math.min((now - heroStart) / 10000, 1);
+  const eased = 1 - Math.pow(1 - t, 3);
+  timeScale = 1 + eased * 0.03;
+  applyHeroTransform();
+  if (t < 1 && !Motion.reduceMotion) requestAnimationFrame(heroTick);
+}
+if (!Motion.reduceMotion) requestAnimationFrame(heroTick);
+
+let scrollZoom = 0;
+function applyHeroTransform() {
+  heroVisual.style.transform = `scale(${(timeScale + scrollZoom).toFixed(4)})`;
+}
+
+function onHeroScroll() {
+  const heroH = hero.offsetHeight;
+  const heroTop = hero.getBoundingClientRect().top;
+  const heroProgress = Math.min(Math.max(-heroTop / heroH, 0), 1);
+
+  scrollZoom = heroProgress * 0.14;
+  applyHeroTransform();
+  heroContent.style.opacity = String(Math.max(1 - heroProgress * 1.5, 0));
+  heroContent.style.transform = `translateY(${-heroProgress * 36}px)`;
+
+  const manTop = manifesto.getBoundingClientRect().top;
+  const vh = window.innerHeight;
+  const isMobileManifesto = window.matchMedia('(max-width: 767px)').matches;
+  const manRange = manifesto.offsetHeight - vh;
+  // On mobile the manifesto is exactly one viewport tall, so derive progress
+  // from its travel through the viewport instead of leaving a blank scroll tail.
+  let manProgress = isMobileManifesto
+    ? (vh - manTop) / (vh + manifesto.offsetHeight)
+    : (manRange > 0 ? (-manTop) / manRange : 0);
+  manProgress = Math.min(Math.max(manProgress, 0), 1);
+
+  texture.style.transform = `scale(${(1.05 + manProgress * 0.55).toFixed(3)})`;
+  texture.style.filter = `brightness(${(0.42 + manProgress * 0.2).toFixed(3)}) saturate(.85) contrast(1.1)`;
+
+  const trapezoid = (p, a, b, c, d) => {
+    if (p <= a || p >= d) return 0;
+    if (p < b) return (p - a) / (b - a);
+    if (p < c) return 1;
+    return 1 - (p - c) / (d - c);
+  };
+  // Overlap the text beats so the cinematic sequence never drops to black
+  // between phrases. The final line remains present through the handoff.
+  const line1P = trapezoid(manProgress, 0, .07, .29, .38);
+  const line2P = trapezoid(manProgress, .22, .32, .62, .74);
+  const line3P = trapezoid(manProgress, .64, .76, 1.5, 1.6);
+
+  manifestoLine1.style.opacity = String(line1P);
+  manifestoLine1.style.transform = `translateY(${(1 - line1P) * 22}px)`;
+  manifestoLine2.style.opacity = String(line2P);
+  manifestoLine2.style.transform = `translateY(${(1 - line2P) * 22}px)`;
+  manifestoLine3.style.opacity = String(line3P);
+  manifestoLine3.style.transform = `translateY(${(1 - line3P) * 22}px)`;
+}
+window.addEventListener('scroll', onHeroScroll, {passive: true});
+window.addEventListener('resize', onHeroScroll);
+onHeroScroll();
+
+/* ---------- shared easing helper for the scroll-scrubbed text reveals ---------- */
+function trapezoid(p, a, b, c, d) {
+  if (p <= a || p >= d) return 0;
+  if (p < b) return (p - a) / (b - a);
+  if (p < c) return 1;
+  return 1 - (p - c) / (d - c);
+}
+
+/* ---------- О НАС / ВИТРИНА / ЗАКАЗ: standard reveal tokens ---------- */
+Motion.reveal('#about [data-reveal]', {stagger: 0});
+Motion.reveal('#vitrina [data-reveal]:not(.tile)', {stagger: 0});
+Motion.reveal('#vitrina .tile', {stagger: 90});
+
+/* ---------- APP: intro text reveal + animated phone (dark back panel → sweep → glow mark → flip to screen) ---------- */
+Motion.reveal('.app-transition [data-reveal]', {stagger: 160});
+Motion.reveal('.phone-below [data-reveal]', {stagger: 160});
+
+const phoneMock = document.querySelector('#phoneMock');
+new IntersectionObserver((entries) => {
+  entries.forEach(entry => { if (entry.isIntersecting) phoneMock.classList.add('active'); });
+}, {threshold: .4}).observe(phoneMock);
+
+/* whole phone opens the app, whichever face is currently showing */
+function openApp() { window.open('https://vslast-premium.web.app', '_blank', 'noopener'); }
+phoneMock.addEventListener('click', openApp);
+phoneMock.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openApp(); } });
+
+/* ---------- ВИТРИНА: per-tile carousel + shared lightbox with swipe/arrow/keyboard navigation ---------- */
+const lightbox = document.querySelector('#lightbox');
+const lightboxImg = document.querySelector('#lightboxImg');
+const lightboxFrame = document.querySelector('#lightboxFrame');
+const lightboxPrev = document.querySelector('#lightboxPrev');
+const lightboxNext = document.querySelector('#lightboxNext');
+
+let lbSlides = [];
+let lbIdx = 0;
+let lbSyncTile = null; // keeps the underlying tile's own carousel/dots in sync with lightbox nav
+
+function lbRenderSlide(crossfade) {
+  const bg = getComputedStyle(lbSlides[lbIdx]).backgroundImage;
+  if (crossfade) {
+    lightboxImg.style.transition = 'opacity .18s ease';
+    lightboxImg.style.opacity = '0';
+    setTimeout(() => {
+      lightboxImg.style.backgroundImage = bg;
+      lightboxImg.style.transition = 'opacity .3s ease';
+      lightboxImg.style.opacity = '1';
+    }, 160);
+  } else {
+    lightboxImg.style.backgroundImage = bg;
+  }
+}
+
+function openLightbox(slides, startIdx, syncFn) {
+  lbSlides = slides;
+  lbIdx = startIdx;
+  lbSyncTile = syncFn;
+  lightboxImg.style.transition = '';
+  lightboxImg.style.opacity = '';
+  lbRenderSlide(false);
+  const multi = slides.length > 1;
+  lightboxPrev.style.display = multi ? 'flex' : 'none';
+  lightboxNext.style.display = multi ? 'flex' : 'none';
+  lightbox.classList.add('open');
+}
+function closeLightbox() {
+  lightbox.classList.remove('open');
+  lightboxImg.style.transition = '';
+  lightboxImg.style.opacity = '';
+}
+function lbNav(dir) {
+  if (lbSlides.length < 2) return;
+  lbIdx = (lbIdx + dir + lbSlides.length) % lbSlides.length;
+  lbRenderSlide(true);
+  if (lbSyncTile) lbSyncTile(lbIdx);
+}
+
+lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+document.querySelector('#lightboxClose').addEventListener('click', closeLightbox);
+lightboxPrev.addEventListener('click', e => { e.stopPropagation(); lbNav(-1); });
+lightboxNext.addEventListener('click', e => { e.stopPropagation(); lbNav(1); });
+window.addEventListener('keydown', e => {
+  if (!lightbox.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowRight') lbNav(1);
+  if (e.key === 'ArrowLeft') lbNav(-1);
+});
+
+/* swipe to advance/go back, touch only */
+let lbTouchStartX = null;
+lightboxFrame.addEventListener('touchstart', e => {
+  lbTouchStartX = e.touches[0].clientX;
+}, {passive: true});
+lightboxFrame.addEventListener('touchend', e => {
+  if (lbTouchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - lbTouchStartX;
+  if (Math.abs(dx) > 40) lbNav(dx < 0 ? 1 : -1);
+  lbTouchStartX = null;
+}, {passive: true});
+
+document.querySelectorAll('.tile').forEach(tile => {
+  const carousel = tile.querySelector('.tile-carousel');
+  const slides = Array.from(tile.querySelectorAll('.tile-slide'));
+  let idx = 0;
+
+  function show(i) {
+    slides[idx].classList.remove('is-active');
+    idx = (i + slides.length) % slides.length;
+    slides[idx].classList.add('is-active');
+    const dots = tile.querySelector('.tile-dots');
+    if (dots) {
+      Array.from(dots.children).forEach(d => d.classList.remove('active'));
+      dots.children[idx].classList.add('active');
+    }
+  }
+
+  // only build dots/arrows when a tile actually holds more than one photo —
+  // add extra .tile-slide elements to a tile later and the controls appear automatically
+  if (slides.length > 1) {
+    const dots = document.createElement('div');
+    dots.className = 'tile-dots';
+    slides.forEach((_, i) => {
+      const d = document.createElement('span');
+      if (i === 0) d.classList.add('active');
+      dots.appendChild(d);
+    });
+    const prev = document.createElement('button');
+    prev.className = 'tile-arrow tile-arrow-prev';
+    prev.type = 'button'; prev.innerHTML = '‹';
+    const next = document.createElement('button');
+    next.className = 'tile-arrow tile-arrow-next';
+    next.type = 'button'; next.innerHTML = '›';
+    tile.append(dots, prev, next);
+
+    prev.addEventListener('click', e => { e.stopPropagation(); show(idx - 1); });
+    next.addEventListener('click', e => { e.stopPropagation(); show(idx + 1); });
+  }
+
+  carousel.addEventListener('click', () => {
+    openLightbox(slides, idx, show);
+  });
+});
+Motion.reveal('#order [data-reveal]', {stagger: 0});
+Motion.reveal('#contacts [data-reveal]', {stagger: 100});
+
+/* ---------- РЕМЕСЛО: standard reveal + shared cursor light + scroll-scrub ring ---------- */
+Motion.reveal('#craft [data-reveal]:not(.stat)', {stagger: 0});
+Motion.reveal('#craft .stat', {stagger: 90});
+Motion.cursorLight(document.querySelector('#craftVisual'), document.querySelector('#visualLight'));
+
+/* ---------- МАСТЕРСТВО: same shared helpers, its own accent and signature moment ---------- */
+Motion.reveal('#mastery [data-reveal]:not(.mentor)', {stagger: 0});
+Motion.reveal('#mastery .mentor', {stagger: 90});
+Motion.cursorLight(document.querySelector('#masteryVisual'), document.querySelector('#masteryLight'));
+
+/* ---------- MASTERY MENTOR CAROUSEL: pinned photo, advances as the reader scrolls through the text ---------- */
+const masterySlides = Array.from(document.querySelectorAll('#masteryVisual .mastery-slide'));
+const masteryNames = ['GaruHaru', 'Gregory Doyen', 'Hans Ovando', 'Вера Никандрова', 'Enric Monzonis'];
+const masteryCaptionName = document.querySelector('#masteryCaptionName');
+const masteryDotsWrap = document.querySelector('#masteryDots');
+masterySlides.forEach((_, i) => {
+  const dot = document.createElement('span');
+  if (i === 0) dot.classList.add('active');
+  masteryDotsWrap.appendChild(dot);
+});
+
+const masterySection = document.querySelector('#mastery');
+let masteryIdx = 0;
+function onMasteryCarouselScroll() {
+  const p = Motion.scrollProgress(masterySection);
+  const idx = Math.min(Math.floor(p * masterySlides.length), masterySlides.length - 1);
+  if (idx !== masteryIdx) {
+    masterySlides[masteryIdx].classList.remove('is-active');
+    masteryDotsWrap.children[masteryIdx].classList.remove('active');
+    masteryIdx = idx;
+    masterySlides[masteryIdx].classList.add('is-active');
+    masteryDotsWrap.children[masteryIdx].classList.add('active');
+    masteryCaptionName.textContent = masteryNames[masteryIdx];
+  }
+}
+window.addEventListener('scroll', onMasteryCarouselScroll, {passive: true});
+window.addEventListener('resize', onMasteryCarouselScroll);
+onMasteryCarouselScroll();
+
+/* ---------- MASTERY MANIFESTO: dark screen -> brightness & zoom rise with scroll -> slogan fades up ---------- */
+const masteryManifesto = document.querySelector('#masteryManifesto');
+const masteryTexture = document.querySelector('#masteryTexture');
+const masteryManifestoText = document.querySelector('#masteryManifestoText');
+
+function onMasteryManifestoScroll() {
+  const isMobileMastery = window.matchMedia('(max-width: 767px)').matches;
+  const masteryRect = masteryManifesto.getBoundingClientRect();
+  const p = isMobileMastery
+    ? Math.min(Math.max((window.innerHeight - masteryRect.top) / (window.innerHeight + masteryManifesto.offsetHeight), 0), 1)
+    : Motion.scrollProgress(masteryManifesto);
+  const masteryScale = isMobileMastery ? (1 + p * 0.04) : (1.02 + p * 0.16);
+  masteryTexture.style.transform = `scale(${masteryScale.toFixed(3)})`;
+  masteryTexture.style.filter = `brightness(${(0.14 + p * 0.66).toFixed(3)}) saturate(.9) contrast(1.08)`;
+
+  const textP = Math.min(p / 0.6, 1);
+  masteryManifestoText.style.opacity = String(textP);
+  masteryManifestoText.style.transform = `translateY(${(1 - textP) * 34}px)`;
+}
+window.addEventListener('scroll', onMasteryManifestoScroll, {passive: true});
+window.addEventListener('resize', onMasteryManifestoScroll);
+onMasteryManifestoScroll();
+
+const ringFill = document.querySelector('#ringFill');
+const ringNum = document.querySelector('#ringNum');
+const craftBg = document.querySelector('#craftBg');
+const craftSection = document.querySelector('#craft');
+const CIRC = 169.6;
+
+function onCraftScroll() {
+  const p = Motion.scrollProgress(craftSection);
+  ringFill.style.strokeDashoffset = String(CIRC * (1 - p));
+  ringNum.textContent = p >= 0.98 ? '24+' : String(Math.round(p * 24));
+  if (!Motion.reduceMotion) craftBg.style.transform = `translateY(${(-p * 22).toFixed(1)}px)`;
+}
+window.addEventListener('scroll', onCraftScroll, {passive: true});
+window.addEventListener('resize', onCraftScroll);
+onCraftScroll();
+</script>
+</body>
+</html>
