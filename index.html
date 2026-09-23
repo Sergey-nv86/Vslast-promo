@@ -127,9 +127,10 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif}
 .brand{width:190px;max-width:48%;height:auto;display:block;filter:brightness(0) invert(1);margin-bottom:42px;opacity:0;animation:fadeUp .9s 2s both}
 .kicker-line{font-size:11px;letter-spacing:.16em;text-transform:uppercase;opacity:0;animation:fadeUp .8s 2.3s both;margin-bottom:22px}
 .hero h1{
-  font-weight:500;font-size:clamp(48px,5.2vw,76px);line-height:.96;letter-spacing:-.03em;
-  margin:0 0 24px;max-width:620px;opacity:0;animation:fadeUp 1s 2.5s both;
+  font-weight:500;font-size:clamp(42px,4.2vw,62px);line-height:1.02;letter-spacing:-.03em;
+  margin:0 0 24px;max-width:700px;opacity:0;animation:fadeUp 1s 2.5s both;
 }
+.hero h1 em{font-style:italic;color:var(--brass)}
 .categories{font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:0;margin-bottom:38px;animation:fadeUp .8s 2.8s both}
 .cta{display:inline-flex;align-items:center;gap:18px;text-decoration:none;font-size:13px;opacity:0;animation:fadeUp .8s 3.05s both}
 .cta .line{width:96px;height:1px;background:currentColor;transition:width var(--dur-micro) var(--ease-hover)}
@@ -150,7 +151,7 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif}
   .visual,.patch{background-position:72% 38%}
   .content{left:20px;right:20px;top:auto;bottom:100px;transform:none;width:auto}
   .brand{width:145px;max-width:none;margin-bottom:28px}
-  .hero h1{font-size:50px;max-width:330px}
+  .hero h1{font-size:42px;max-width:360px;line-height:1.03}
   .categories{font-size:9px;line-height:1.8;margin-bottom:28px}
   .scroll-hint{display:none}
   .progress{right:20px;bottom:28px}
@@ -1130,7 +1131,7 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   <div class="content" id="heroContent">
     <img class="brand" src="images/logo.png" alt="Всласть — пекарня и кондитерская">
     <div class="kicker-line">Ремесленная пекарня и кондитерская</div>
-    <h1>Вкус, которому<br>нужно время.</h1>
+    <h1>Мы не хотели делать<br>большую пекарню.<br><em>Мы хотели делать настоящий продукт.</em></h1>
     <div class="categories">Нижневартовск</div>
   </div>
 
@@ -1268,6 +1269,7 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
       <div class="kicker" data-reveal><i></i>Мастерство</div>
       <h2 data-reveal>Десерты, на которые<br><em>ушли годы.</em></h2>
       <p class="lead" data-reveal>
+        <strong>Мы учимся у лучших, но создаём своё.</strong><br>
         Оксана училась не на одном мастер-классе ради вдохновения — а последовательно,
         у нескольких кондитеров с мировым именем. Технику нужно было повторить сотни раз,
         прежде чем она стала своей.
