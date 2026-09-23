@@ -232,6 +232,26 @@ h1,h2,h3{font-family:Fraunces,Georgia,serif}
   .people-photo:after{background:linear-gradient(180deg,rgba(9,7,6,.35) 20%,rgba(9,7,6,.92) 78%)}
 }
 
+/* ===================== ПЕРЕХОД К ДЕСЕРТАМ ===================== */
+.dessert-transition{
+  background:var(--ink);
+  padding:clamp(70px,10vw,120px) 24px;
+  text-align:center;
+}
+.dessert-transition p{
+  margin:0;
+  font-family:Fraunces,Georgia,serif;
+  font-size:clamp(32px,4vw,58px);
+  line-height:1;
+}
+.dessert-transition-sub{
+  margin-top:18px!important;
+  font-family:Manrope,system-ui,sans-serif!important;
+  font-size:14px!important;
+  line-height:1.6!important;
+  opacity:.58;
+}
+
 /* ===================== MASTERY MANIFESTO (dessert counterpart of the bread manifesto scene) ===================== */
 .mastery-manifesto{height:130svh;min-height:820px;position:relative;overflow:hidden;display:grid;place-items:center;background:var(--ink2)}
 .mastery-manifesto-inner{position:sticky;top:0;height:100svh;width:100%;display:grid;place-items:center;overflow:hidden}
@@ -1475,6 +1495,10 @@ function trapezoid(p, a, b, c, d) {
   if (p < c) return 1;
   return 1 - (p - c) / (d - c);
 }
+
+/* ---------- PEOPLE / DESSERT TRANSITION: standard reveal tokens ---------- */
+Motion.reveal('#people [data-reveal]', {stagger: 0});
+Motion.reveal('#dessertTransition [data-reveal]', {stagger: 120});
 
 /* ---------- О НАС / ВИТРИНА / ЗАКАЗ: standard reveal tokens ---------- */
 Motion.reveal('#about [data-reveal]', {stagger: 0});
