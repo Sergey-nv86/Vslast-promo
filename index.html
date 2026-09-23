@@ -1136,6 +1136,108 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   }
 }
 
+
+/* ============================================================
+   MOBILE STICKY STORY — final architecture
+   Фото/часы остаются в верхней точке экрана, пока текст секции
+   прокручивается. Без flex/grid-контейнера, который ограничивает
+   sticky в Safari/iOS.
+   ============================================================ */
+@media (max-width:600px){
+  #craft,
+  #mastery{
+    overflow:visible!important;
+  }
+
+  #craft .craft-inner,
+  #mastery .mastery-inner{
+    display:block!important;
+    position:relative!important;
+    overflow:visible!important;
+    transform:none!important;
+  }
+
+  #craft .craft-visual,
+  #mastery .mastery-visual{
+    position:-webkit-sticky!important;
+    position:sticky!important;
+    top:58px!important;
+    left:auto!important;
+    right:auto!important;
+    align-self:flex-start!important;
+    display:block!important;
+    float:none!important;
+    z-index:40!important;
+    opacity:1!important;
+    transform:none!important;
+  }
+
+  #craft .craft-visual{
+    width:calc(100% + 40px)!important;
+    height:56svh!important;
+    min-height:340px!important;
+    max-height:520px!important;
+    margin:0 -20px 52px!important;
+  }
+
+  #craft .craft-visual .visual-img{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    background-image:url("images/bread.jpg")!important;
+    background-size:cover!important;
+    background-position:center center!important;
+    background-repeat:no-repeat!important;
+    transform:none!important;
+    animation:none!important;
+    opacity:1!important;
+  }
+
+  #craft .craft-visual .ring-wrap{
+    position:absolute!important;
+    left:20px!important;
+    bottom:20px!important;
+    z-index:50!important;
+    display:flex!important;
+    visibility:visible!important;
+    opacity:1!important;
+  }
+
+  #mastery .mastery-visual{
+    width:calc(100% + 40px)!important;
+    height:56svh!important;
+    min-height:340px!important;
+    max-height:520px!important;
+    margin:0 -20px 52px!important;
+  }
+
+  #mastery .mastery-slide{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    background-size:cover!important;
+    background-position:center center!important;
+    background-repeat:no-repeat!important;
+    transform:none!important;
+    opacity:0!important;
+  }
+
+  #mastery .mastery-slide.is-active{
+    opacity:1!important;
+  }
+
+  #craft .craft-text,
+  #mastery .mastery-text{
+    display:block!important;
+    position:relative!important;
+    width:100%!important;
+    margin:0!important;
+    transform:none!important;
+  }
+}
+
 </style>
 </head>
 <body>
