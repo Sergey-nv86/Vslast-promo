@@ -1045,6 +1045,48 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   }
 }
 
+
+/* MOBILE MASTERY — pinned mentor photo + scroll-driven carousel */
+@media (max-width:600px){
+  #mastery{
+    overflow:visible!important;
+  }
+  #mastery .mastery-inner{
+    overflow:visible!important;
+  }
+  #mastery .mastery-visual{
+    position:-webkit-sticky!important;
+    position:sticky!important;
+    top:58px!important;
+    align-self:flex-start!important;
+    width:calc(100% + 40px)!important;
+    height:56svh!important;
+    min-height:340px!important;
+    max-height:520px!important;
+    margin:0 -20px 46px!important;
+    z-index:20!important;
+    opacity:1!important;
+    transform:none!important;
+  }
+  #mastery .mastery-slide{
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    background-size:cover!important;
+    background-position:center center!important;
+    background-repeat:no-repeat!important;
+    transform:none!important;
+  }
+  #mastery .mastery-caption{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    z-index:4!important;
+  }
+}
+
 </style>
 </head>
 <body>
