@@ -1145,35 +1145,22 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
 /* ===================== SOUND EXPERIENCE ===================== */
 .sound-toggle{
   position:fixed;left:clamp(20px,5.5vw,80px);bottom:24px;z-index:60;
-  display:inline-flex;align-items:center;gap:9px;
-  border:1px solid rgba(247,242,234,.16);border-radius:999px;
-  background:rgba(23,20,17,.52);backdrop-filter:blur(14px);
-  color:var(--milk);padding:9px 13px;
-  font:500 9px/1 Manrope,system-ui,sans-serif;
-  letter-spacing:.13em;text-transform:uppercase;
-  cursor:pointer;opacity:0;animation:fadeUp .7s 3.2s both;
-  transition:background .3s var(--ease-hover),border-color .3s var(--ease-hover),opacity .3s;
+  display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(247,242,234,.16);
+  border-radius:999px;background:rgba(23,20,17,.52);backdrop-filter:blur(14px);
+  color:var(--milk);padding:9px 13px;font:500 9px/1 Manrope,system-ui,sans-serif;
+  letter-spacing:.13em;text-transform:uppercase;cursor:pointer;opacity:0;
+  animation:fadeUp .7s 3.2s both;transition:background .3s,border-color .3s;
 }
 .sound-toggle:hover{background:rgba(23,20,17,.78);border-color:rgba(247,242,234,.3)}
-.sound-toggle .sound-dot{
-  width:6px;height:6px;border-radius:50%;background:rgba(247,242,234,.42);
-  transition:background .3s,box-shadow .3s;
-}
+.sound-toggle .sound-dot{width:6px;height:6px;border-radius:50%;background:rgba(247,242,234,.42);transition:.3s}
 .sound-toggle.is-on .sound-dot{background:var(--brass);box-shadow:0 0 10px rgba(183,154,106,.55)}
 .sound-toggle .sound-waves{display:inline-flex;align-items:center;gap:2px;height:10px}
-.sound-toggle .sound-waves i{display:block;width:1px;height:4px;background:currentColor;opacity:.42;transition:height .25s}
-.sound-toggle.is-on .sound-waves i:nth-child(1){height:5px;animation:soundWave .9s ease-in-out infinite}
-.sound-toggle.is-on .sound-waves i:nth-child(2){height:9px;animation:soundWave .75s .12s ease-in-out infinite}
-.sound-toggle.is-on .sound-waves i:nth-child(3){height:6px;animation:soundWave .95s .22s ease-in-out infinite}
-@keyframes soundWave{0%,100%{transform:scaleY(.65)}50%{transform:scaleY(1.15)}}
-@media(max-width:800px){
-  .sound-toggle{left:auto;right:20px;bottom:18px;padding:9px 11px}
-}
-@media(prefers-reduced-motion:reduce){
-  .sound-toggle{animation:none;opacity:1}
-  .sound-toggle .sound-waves i{animation:none!important}
-}
-
+.sound-toggle .sound-waves i{display:block;width:1px;height:4px;background:currentColor;opacity:.42}
+.sound-toggle.is-on .sound-waves i:nth-child(1){height:5px}
+.sound-toggle.is-on .sound-waves i:nth-child(2){height:9px}
+.sound-toggle.is-on .sound-waves i:nth-child(3){height:6px}
+@media(max-width:800px){.sound-toggle{left:auto;right:20px;bottom:18px;padding:9px 11px}}
+@media(prefers-reduced-motion:reduce){.sound-toggle{animation:none;opacity:1}}
 </style>
 </head>
 <body>
@@ -1604,117 +1591,82 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
 
 <script>
 
-/* ---------- SOUND: subtle original ambient score, starts only after a user gesture ---------- */
+/* ---------- SOUND: cinematic section-aware sound design ---------- */
 const Soundscape = (() => {
-  let ctx = null;
-  let master = null;
-  let filter = null;
-  let active = false;
-  let timer = null;
-  let step = 0;
-  const toggle = document.querySelector('#soundToggle');
-  const label = document.querySelector('#soundLabel');
-
-  const chords = [
-    [110.00, 138.59, 164.81],
-    [98.00, 123.47, 146.83],
-    [82.41, 103.83, 123.47],
-    [92.50, 116.54, 138.59]
+  let ctx=null, master=null, music=null, pad=null, room=null, active=false, raf=0, lastSection='';
+  const toggle=document.querySelector('#soundToggle'), label=document.querySelector('#soundLabel');
+  const sections=[
+    {id:'hero',name:'hero',a:0},
+    {id:'people',name:'people',a:0},
+    {id:'manifesto',name:'manifesto',a:0},
+    {id:'craft',name:'craft',a:0},
+    {id:'mastery',name:'mastery',a:0},
+    {id:'order',name:'final',a:0}
   ];
-
-  function makeVoice(freq, gainValue, duration, delay = 0) {
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-    lfo.type = 'sine';
-    lfo.frequency.value = .055 + Math.random() * .025;
-    lfoGain.gain.value = freq * .018;
-
-    lfo.connect(lfoGain).connect(osc.frequency);
-    osc.connect(gain).connect(filter);
-
-    const now = ctx.currentTime + delay;
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(gainValue, now + Math.min(2.8, duration * .35));
-    gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
-
-    osc.start(now);
-    lfo.start(now);
-    osc.stop(now + duration + .2);
-    lfo.stop(now + duration + .2);
+  const notes={people:[220,277.18,329.63],craft:[196,246.94,293.66],mastery:[246.94,311.13,369.99],final:[220,277.18,329.63]};
+  function gain(v,t=.8){const g=ctx.createGain();g.gain.value=v;g.connect(master);return g}
+  function osc(freq,type,vol,detune=0){
+    const o=ctx.createOscillator();const g=ctx.createGain();o.type=type;o.frequency.value=freq;o.detune.value=detune;g.gain.value=vol;o.connect(g).connect(master);o.start();return {o,g}
   }
-
-  function playPhrase() {
-    if (!active || !ctx) return;
-    const chord = chords[step % chords.length];
-    chord.forEach((f, i) => makeVoice(f, .026 + i * .006, 7.5 + i * .8, i * .08));
-    step++;
-    timer = setTimeout(playPhrase, 6500);
+  function setup(){
+    ctx=new(window.AudioContext||window.webkitAudioContext)();
+    master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);
+    music=ctx.createGain();music.gain.value=0;music.connect(master);
+    pad=ctx.createGain();pad.gain.value=0;pad.connect(master);
+    const f=ctx.createBiquadFilter();f.type='lowpass';f.frequency.value=900;f.Q.value=.3;
+    room=ctx.createGain();room.gain.value=.018;room.connect(f).connect(master);
+    const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate), d=buffer.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.035;
+    const src=ctx.createBufferSource();src.buffer=buffer;src.loop=true;src.connect(room);src.start();
+    [0,-7,7].forEach(det=>{const v=osc(55,'sine',.035,det);v.g.connect(pad)});
+    return true;
   }
-
-  async function start() {
-    if (!ctx) {
-      ctx = new (window.AudioContext || window.webkitAudioContext)();
-      master = ctx.createGain();
-      filter = ctx.createBiquadFilter();
-      filter.type = 'lowpass';
-      filter.frequency.value = 1250;
-      filter.Q.value = .35;
-      master.gain.value = 0;
-      filter.connect(master).connect(ctx.destination);
+  function piano(freq,when,dur=3){
+    const o=ctx.createOscillator(),g=ctx.createGain(),h=ctx.createOscillator(),hg=ctx.createGain();
+    o.type='sine';o.frequency.value=freq;h.type='triangle';h.frequency.value=freq*2.01;
+    g.gain.setValueAtTime(.0001,when);g.gain.exponentialRampToValueAtTime(.028,when+.08);g.gain.exponentialRampToValueAtTime(.0001,when+dur);
+    hg.gain.setValueAtTime(.0001,when);hg.gain.exponentialRampToValueAtTime(.006,when+.05);hg.gain.exponentialRampToValueAtTime(.0001,when+dur*.8);
+    o.connect(g).connect(music);h.connect(hg).connect(music);o.start(when);h.start(when);o.stop(when+dur+.1);h.stop(when+dur+.1);
+  }
+  let next=0,phrase=0;
+  function scheduleMusic(){
+    if(!active)return;
+    const s=lastSection;
+    if(s==='manifesto'||s==='hero'){next=ctx.currentTime+.7;return}
+    if(ctx.currentTime>=next){
+      const n=(notes[s]||notes.people)[phrase%3];
+      piano(n,next,5.5); if(s==='people'||s==='final') piano(n/2,next+2.5,5);
+      phrase++; next=ctx.currentTime+5.8;
     }
-    await ctx.resume();
-    active = true;
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.34, ctx.currentTime + 2.4);
-    clearTimeout(timer);
-    playPhrase();
-    toggle.classList.add('is-on');
-    toggle.setAttribute('aria-pressed','true');
-    toggle.setAttribute('aria-label','Выключить фоновый звук');
-    label.textContent='Звук · ON';
-    try{ localStorage.setItem('vslastSound','on'); }catch(e){}
   }
-
-  function stop() {
-    if (!ctx || !master) return;
-    active = false;
-    clearTimeout(timer);
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.0001, ctx.currentTime + 1.2);
-    toggle.classList.remove('is-on');
-    toggle.setAttribute('aria-pressed','false');
-    toggle.setAttribute('aria-label','Включить фоновый звук');
-    label.textContent='Звук';
-    try{ localStorage.setItem('vslastSound','off'); }catch(e){}
+  function crackle(){
+    if(!active||lastSection!=='craft')return;
+    const now=ctx.currentTime, b=ctx.createBuffer(1,ctx.sampleRate*.07,ctx.sampleRate),d=b.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.exp(-i/d.length*7);
+    const s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=b;g.gain.value=.018;s.connect(g).connect(master);s.start(now);
+    setTimeout(crackle,3500+Math.random()*4500);
   }
-
-  toggle.addEventListener('click', () => active ? stop() : start());
-
-  /* Browsers require a gesture before audible playback. If the visitor
-     explicitly enabled sound on a previous visit, the first interaction
-     resumes it rather than forcing autoplay. */
-  try {
-    if (localStorage.getItem('vslastSound') === 'on') {
-      const resume = () => {
-        if (!active) start();
-        window.removeEventListener('pointerdown', resume);
-        window.removeEventListener('keydown', resume);
-      };
-      window.addEventListener('pointerdown', resume, {once:true});
-      window.addEventListener('keydown', resume, {once:true});
-    }
-  } catch(e){}
-
-  return {start, stop};
+  function accent(){if(!ctx||!active)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(82,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(44,ctx.currentTime+.7);g.gain.setValueAtTime(.0001,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.055,ctx.currentTime+.025);g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.75);o.connect(g).connect(master);o.start();o.stop(ctx.currentTime+.8)}
+  function section(){
+    const y=window.scrollY+window.innerHeight*.48;
+    let found=sections[0];for(const s of sections){const el=document.getElementById(s.id);if(el&&y>=el.offsetTop)found=s}
+    if(found.name!==lastSection){lastSection=found.name;if(found.name==='hero')accent();}
+    const target={hero:.10,people:.16,manifesto:.018,craft:.18,mastery:.20,final:.13}[lastSection]??.10;
+    music.gain.setTargetAtTime(lastSection==='manifesto'?0:target,ctx.currentTime,.9);
+    pad.gain.setTargetAtTime(lastSection==='manifesto'?.008:.018,ctx.currentTime,1.2);
+    room.gain.setTargetAtTime(lastSection==='craft'?.028:.012,ctx.currentTime,1);
+  }
+  function tick(){if(!active)return;section();scheduleMusic();raf=requestAnimationFrame(tick)}
+  async function start(){
+    if(!ctx)setup();await ctx.resume();active=true;master.gain.setTargetAtTime(.55,ctx.currentTime,2);
+    toggle.classList.add('is-on');toggle.setAttribute('aria-pressed','true');toggle.setAttribute('aria-label','Выключить звуковую версию');label.textContent='Звук · ON';
+    try{localStorage.setItem('vslastSound','on')}catch(e){} next=ctx.currentTime+.5;crackle();cancelAnimationFrame(raf);tick();
+  }
+  function stop(){if(!ctx)return;active=false;cancelAnimationFrame(raf);master.gain.setTargetAtTime(.0001,ctx.currentTime,1);toggle.classList.remove('is-on');toggle.setAttribute('aria-pressed','false');toggle.setAttribute('aria-label','Включить звуковую версию');label.textContent='Звук';try{localStorage.setItem('vslastSound','off')}catch(e){}}
+  toggle.addEventListener('click',()=>active?stop():start());
+  window.addEventListener('scroll',()=>{if(active)section()},{passive:true});
+  try{if(localStorage.getItem('vslastSound')==='on'){const resume=()=>{start();window.removeEventListener('pointerdown',resume);window.removeEventListener('keydown',resume)};window.addEventListener('pointerdown',resume,{once:true});window.addEventListener('keydown',resume,{once:true})}}catch(e){}
 })();
-
 /* ============================================================
    MOTION CORE — общие хелперы для scroll-reveal и курсорного света.
    Любая новая секция подключается через эти же три функции,
