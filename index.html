@@ -1141,6 +1141,39 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   #mastery .mastery-arrow-prev{left:12px!important}
   #mastery .mastery-arrow-next{right:12px!important}
 }
+
+/* ===================== SOUND EXPERIENCE ===================== */
+.sound-toggle{
+  position:fixed;left:clamp(20px,5.5vw,80px);bottom:24px;z-index:60;
+  display:inline-flex;align-items:center;gap:9px;
+  border:1px solid rgba(247,242,234,.16);border-radius:999px;
+  background:rgba(23,20,17,.52);backdrop-filter:blur(14px);
+  color:var(--milk);padding:9px 13px;
+  font:500 9px/1 Manrope,system-ui,sans-serif;
+  letter-spacing:.13em;text-transform:uppercase;
+  cursor:pointer;opacity:0;animation:fadeUp .7s 3.2s both;
+  transition:background .3s var(--ease-hover),border-color .3s var(--ease-hover),opacity .3s;
+}
+.sound-toggle:hover{background:rgba(23,20,17,.78);border-color:rgba(247,242,234,.3)}
+.sound-toggle .sound-dot{
+  width:6px;height:6px;border-radius:50%;background:rgba(247,242,234,.42);
+  transition:background .3s,box-shadow .3s;
+}
+.sound-toggle.is-on .sound-dot{background:var(--brass);box-shadow:0 0 10px rgba(183,154,106,.55)}
+.sound-toggle .sound-waves{display:inline-flex;align-items:center;gap:2px;height:10px}
+.sound-toggle .sound-waves i{display:block;width:1px;height:4px;background:currentColor;opacity:.42;transition:height .25s}
+.sound-toggle.is-on .sound-waves i:nth-child(1){height:5px;animation:soundWave .9s ease-in-out infinite}
+.sound-toggle.is-on .sound-waves i:nth-child(2){height:9px;animation:soundWave .75s .12s ease-in-out infinite}
+.sound-toggle.is-on .sound-waves i:nth-child(3){height:6px;animation:soundWave .95s .22s ease-in-out infinite}
+@keyframes soundWave{0%,100%{transform:scaleY(.65)}50%{transform:scaleY(1.15)}}
+@media(max-width:800px){
+  .sound-toggle{left:auto;right:20px;bottom:18px;padding:9px 11px}
+}
+@media(prefers-reduced-motion:reduce){
+  .sound-toggle{animation:none;opacity:1}
+  .sound-toggle .sound-waves i{animation:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -1152,6 +1185,13 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
   </div>
   <a class="nav-app" href="https://vslast-premium.web.app" target="_blank" rel="noopener">Открыть PWA-приложение ↗</a>
 </nav>
+
+<button class="sound-toggle" id="soundToggle" type="button" aria-label="Включить фоновый звук" aria-pressed="false">
+  <span class="sound-dot"></span>
+  <span class="sound-waves" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span id="soundLabel">Звук</span>
+</button>
+
 
 <!-- ===================== HERO ===================== -->
 <section class="hero" id="hero">
@@ -1563,6 +1603,118 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
 </footer>
 
 <script>
+
+/* ---------- SOUND: subtle original ambient score, starts only after a user gesture ---------- */
+const Soundscape = (() => {
+  let ctx = null;
+  let master = null;
+  let filter = null;
+  let active = false;
+  let timer = null;
+  let step = 0;
+  const toggle = document.querySelector('#soundToggle');
+  const label = document.querySelector('#soundLabel');
+
+  const chords = [
+    [110.00, 138.59, 164.81],
+    [98.00, 123.47, 146.83],
+    [82.41, 103.83, 123.47],
+    [92.50, 116.54, 138.59]
+  ];
+
+  function makeVoice(freq, gainValue, duration, delay = 0) {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    lfo.type = 'sine';
+    lfo.frequency.value = .055 + Math.random() * .025;
+    lfoGain.gain.value = freq * .018;
+
+    lfo.connect(lfoGain).connect(osc.frequency);
+    osc.connect(gain).connect(filter);
+
+    const now = ctx.currentTime + delay;
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(gainValue, now + Math.min(2.8, duration * .35));
+    gain.gain.exponentialRampToValueAtTime(.0001, now + duration);
+
+    osc.start(now);
+    lfo.start(now);
+    osc.stop(now + duration + .2);
+    lfo.stop(now + duration + .2);
+  }
+
+  function playPhrase() {
+    if (!active || !ctx) return;
+    const chord = chords[step % chords.length];
+    chord.forEach((f, i) => makeVoice(f, .026 + i * .006, 7.5 + i * .8, i * .08));
+    step++;
+    timer = setTimeout(playPhrase, 6500);
+  }
+
+  async function start() {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      master = ctx.createGain();
+      filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 1250;
+      filter.Q.value = .35;
+      master.gain.value = 0;
+      filter.connect(master).connect(ctx.destination);
+    }
+    await ctx.resume();
+    active = true;
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(.34, ctx.currentTime + 2.4);
+    clearTimeout(timer);
+    playPhrase();
+    toggle.classList.add('is-on');
+    toggle.setAttribute('aria-pressed','true');
+    toggle.setAttribute('aria-label','Выключить фоновый звук');
+    label.textContent='Звук · ON';
+    try{ localStorage.setItem('vslastSound','on'); }catch(e){}
+  }
+
+  function stop() {
+    if (!ctx || !master) return;
+    active = false;
+    clearTimeout(timer);
+    master.gain.cancelScheduledValues(ctx.currentTime);
+    master.gain.setValueAtTime(master.gain.value, ctx.currentTime);
+    master.gain.linearRampToValueAtTime(.0001, ctx.currentTime + 1.2);
+    toggle.classList.remove('is-on');
+    toggle.setAttribute('aria-pressed','false');
+    toggle.setAttribute('aria-label','Включить фоновый звук');
+    label.textContent='Звук';
+    try{ localStorage.setItem('vslastSound','off'); }catch(e){}
+  }
+
+  toggle.addEventListener('click', () => active ? stop() : start());
+
+  /* Browsers require a gesture before audible playback. If the visitor
+     explicitly enabled sound on a previous visit, the first interaction
+     resumes it rather than forcing autoplay. */
+  try {
+    if (localStorage.getItem('vslastSound') === 'on') {
+      const resume = () => {
+        if (!active) start();
+        window.removeEventListener('pointerdown', resume);
+        window.removeEventListener('keydown', resume);
+      };
+      window.addEventListener('pointerdown', resume, {once:true});
+      window.addEventListener('keydown', resume, {once:true});
+    }
+  } catch(e){}
+
+  return {start, stop};
+})();
+
 /* ============================================================
    MOTION CORE — общие хелперы для scroll-reveal и курсорного света.
    Любая новая секция подключается через эти же три функции,
