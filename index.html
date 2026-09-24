@@ -1591,177 +1591,222 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
 
 <script>
 
-/* ---------- SOUND: mobile-safe cinematic sound design ---------- */
+/* ---------- SOUND: real audio cinematic sound design ---------- */
 const Soundscape = (() => {
-  let ctx=null, master=null, music=null, pad=null, room=null, active=false, raf=0, lastSection='';
-  const toggle=document.querySelector('#soundToggle'), label=document.querySelector('#soundLabel');
-  const sections=[
-    {id:'hero',name:'hero'},{id:'people',name:'people'},{id:'manifesto',name:'manifesto'},
-    {id:'craft',name:'craft'},{id:'mastery',name:'mastery'},{id:'order',name:'final'}
-  ];
-  const notes={
-    hero:[164.81,196,246.94],
-    people:[220,277.18,329.63],
-    craft:[196,246.94,293.66],
-    mastery:[246.94,311.13,369.99],
-    final:[220,277.18,329.63]
+  const toggle = document.querySelector('#soundToggle');
+  const label = document.querySelector('#soundLabel');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const tracks = {
+    ambience: 'audio/hero-ambience.mp3',
+    theme: 'audio/theme-piano.mp3',
+    craft: 'audio/bread-craft.mp3',
+    oven: 'audio/oven-bread.mp3',
+    dessert: 'audio/dessert-atmosphere.mp3',
+    final: 'audio/final-theme.mp3',
+    accent: 'audio/bread-accent.mp3'
   };
 
-  function setup(){
-    const AC=window.AudioContext||window.webkitAudioContext;
-    if(!AC) return false;
-    ctx=new AC();
-    master=ctx.createGain();
-    music=ctx.createGain();
-    pad=ctx.createGain();
-    room=ctx.createGain();
-    const filter=ctx.createBiquadFilter();
-    filter.type='lowpass'; filter.frequency.value=1500; filter.Q.value=.35;
+  const zones = [
+    {id:'hero', name:'hero'},
+    {id:'people', name:'people'},
+    {id:'manifesto', name:'manifesto'},
+    {id:'craft', name:'craft'},
+    {id:'mastery', name:'mastery'},
+    {id:'order', name:'final'}
+  ];
 
-    master.gain.value=.0001;
-    music.gain.value=.55;
-    pad.gain.value=.20;
-    room.gain.value=.035;
+  const players = {};
+  let active = false;
+  let currentZone = '';
+  let raf = 0;
+  let lastScrollY = window.scrollY;
+  let initialized = false;
+  let accentPlayed = false;
 
-    music.connect(master);
-    pad.connect(master);
-    room.connect(filter).connect(master);
-    master.connect(ctx.destination);
+  const levels = {
+    ambience: .11,
+    theme: .13,
+    craft: .14,
+    oven: .075,
+    dessert: .10,
+    final: .13
+  };
 
-    // Warm low drone.
-    [55,82.41].forEach((freq,i)=>{
-      const o=ctx.createOscillator(), g=ctx.createGain();
-      o.type='sine'; o.frequency.value=freq;
-      g.gain.value=i? .055:.07;
-      o.connect(g).connect(pad); o.start();
+  function makePlayer(key, loop = true) {
+    const audio = new Audio(tracks[key]);
+    audio.preload = 'auto';
+    audio.loop = loop;
+    audio.playsInline = true;
+    audio.crossOrigin = 'anonymous';
+    audio.volume = 0;
+    audio.setAttribute('aria-hidden','true');
+    audio.style.display = 'none';
+    document.body.appendChild(audio);
+    players[key] = audio;
+    return audio;
+  }
+
+  function setup() {
+    if (initialized) return;
+    initialized = true;
+    ['ambience','theme','craft','oven','dessert','final'].forEach(key => makePlayer(key, true));
+    makePlayer('accent', false);
+
+    Object.entries(players).forEach(([key, audio]) => {
+      audio.addEventListener('error', () => {
+        console.warn('[Всласть] Audio asset unavailable:', tracks[key]);
+      });
     });
-
-    // Very quiet room texture, helps the sound remain audible on phone speakers.
-    const buffer=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);
-    const data=buffer.getChannelData(0);
-    for(let i=0;i<data.length;i++) data[i]=(Math.random()*2-1)*.045;
-    const noise=ctx.createBufferSource(); noise.buffer=buffer; noise.loop=true;
-    noise.connect(room); noise.start();
-
-    return true;
   }
 
-  function note(freq,when,dur=5.2,level=.055){
-    const o=ctx.createOscillator(),g=ctx.createGain();
-    const h=ctx.createOscillator(),hg=ctx.createGain();
-    o.type='sine'; o.frequency.value=freq;
-    h.type='triangle'; h.frequency.value=freq*2;
-    g.gain.setValueAtTime(.0001,when);
-    g.gain.exponentialRampToValueAtTime(level,when+.10);
-    g.gain.exponentialRampToValueAtTime(.0001,when+dur);
-    hg.gain.setValueAtTime(.0001,when);
-    hg.gain.exponentialRampToValueAtTime(level*.20,when+.08);
-    hg.gain.exponentialRampToValueAtTime(.0001,when+dur*.75);
-    o.connect(g).connect(music); h.connect(hg).connect(music);
-    o.start(when); h.start(when);
-    o.stop(when+dur+.1); h.stop(when+dur+.1);
+  function setVolume(key, target, duration = 1.8) {
+    const audio = players[key];
+    if (!audio) return;
+    const from = audio.volume;
+    const started = performance.now();
+    const tick = now => {
+      const p = Math.min((now - started) / (duration * 1000), 1);
+      const eased = p < .5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+      audio.volume = from + (target - from) * eased;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }
 
-  let next=0,phrase=0;
-  function scheduleMusic(){
-    if(!active || !ctx) return;
-    if(ctx.currentTime>=next){
-      const arr=notes[lastSection]||notes.people;
-      const n=arr[phrase%arr.length];
-      note(n,next,6.2,.075);
-      if(lastSection==='people'||lastSection==='final') note(n/2,next+2.6,5.5,.045);
-      phrase++;
-      next=ctx.currentTime+5.7;
+  async function play(key) {
+    const audio = players[key];
+    if (!audio) return;
+    if (audio.paused) {
+      try { await audio.play(); } catch(e) { return; }
     }
   }
 
-  function section(){
-    const y=window.scrollY+window.innerHeight*.48;
-    let found=sections[0];
-    for(const s of sections){
-      const el=document.getElementById(s.id);
-      if(el&&y>=el.offsetTop) found=s;
-    }
-    if(found.name!==lastSection){
-      lastSection=found.name;
-      if(lastSection==='hero'){
-        const o=ctx.createOscillator(),g=ctx.createGain();
-        o.type='sine'; o.frequency.setValueAtTime(96,ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(58,ctx.currentTime+.8);
-        g.gain.setValueAtTime(.0001,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(.08,ctx.currentTime+.04);
-        g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.9);
-        o.connect(g).connect(master); o.start(); o.stop(ctx.currentTime+1);
+  function pause(key, duration = 1.5) {
+    const audio = players[key];
+    if (!audio) return;
+    const from = audio.volume;
+    const started = performance.now();
+    const tick = now => {
+      const p = Math.min((now - started) / (duration * 1000), 1);
+      audio.volume = from * (1 - p);
+      if (p < 1) requestAnimationFrame(tick);
+      else audio.pause();
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function zoneAtScroll() {
+    const y = window.scrollY + window.innerHeight * .45;
+    let found = zones[0];
+    zones.forEach(zone => {
+      const el = document.getElementById(zone.id);
+      if (el && y >= el.offsetTop) found = zone;
+    });
+    return found.name;
+  }
+
+  async function applyZone() {
+    if (!active) return;
+    const zone = zoneAtScroll();
+    if (zone === currentZone) return;
+    currentZone = zone;
+
+    const targets = {
+      hero:     {ambience:.11, theme:.025, craft:0, oven:0, dessert:0, final:0},
+      people:   {ambience:.07, theme:.12, craft:0, oven:0, dessert:0, final:0},
+      manifesto:{ambience:.035,theme:0,    craft:0, oven:0, dessert:0, final:0},
+      craft:    {ambience:.025,theme:.08,  craft:.13,oven:.065,dessert:0,final:0},
+      mastery:  {ambience:.018,theme:.025, craft:0, oven:0,dessert:.10,final:0},
+      final:    {ambience:.04, theme:0,    craft:0, oven:0,dessert:0,final:.13}
+    }[zone];
+
+    await Promise.all(Object.keys(targets).map(play));
+    Object.keys(targets).forEach(key => setVolume(key, reduceMotion ? targets[key] * .65 : targets[key], 2.2));
+
+    if (zone === 'craft' && !accentPlayed) {
+      accentPlayed = true;
+      const a = players.accent;
+      if (a) {
+        a.currentTime = 0;
+        a.volume = .18;
+        a.play().catch(()=>{});
       }
     }
-
-    // Strong enough on desktop and phone speakers, while still clearly ambient.
-    const target={
-      hero:.34, people:.48, manifesto:.055, craft:.52, mastery:.58, final:.40
-    }[lastSection] ?? .38;
-    music.gain.setTargetAtTime(lastSection==='manifesto'?.02:target,ctx.currentTime,.75);
-    pad.gain.setTargetAtTime(lastSection==='manifesto'?.06:.24,ctx.currentTime,1);
-    room.gain.setTargetAtTime(lastSection==='craft'?.06:.025,ctx.currentTime,1);
   }
 
-  function tick(){
-    if(!active) return;
-    section(); scheduleMusic();
-    raf=requestAnimationFrame(tick);
+  function stopAll() {
+    Object.keys(players).forEach(key => {
+      const audio = players[key];
+      audio.pause();
+      audio.volume = 0;
+      if (key !== 'accent') audio.currentTime = 0;
+    });
   }
 
-  async function start(){
-    if(!ctx && !setup()) return;
-    // Critical for iOS Safari: resume INSIDE the button/pointer gesture.
-    if(ctx.state==='suspended') await ctx.resume();
-    if(ctx.state!=='running') return;
+  async function start() {
+    setup();
 
-    active=true;
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setValueAtTime(Math.max(master.gain.value,.0001),ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.82,ctx.currentTime+1.6);
+    // iOS Safari requires playback to begin inside the user gesture.
+    const first = players.ambience;
+    try {
+      await first.play();
+    } catch(e) {
+      return;
+    }
 
+    active = true;
+    currentZone = '';
+    accentPlayed = false;
     toggle.classList.add('is-on');
     toggle.setAttribute('aria-pressed','true');
     toggle.setAttribute('aria-label','Выключить звуковую версию');
     label.textContent='Звук · ON';
-    try{localStorage.setItem('vslastSound','on')}catch(e){}
-    lastSection='';
-    next=ctx.currentTime+.15;
-    cancelAnimationFrame(raf);
-    tick();
+    try { localStorage.setItem('vslastSound','on'); } catch(e) {}
+    await applyZone();
   }
 
-  function stop(){
-    if(!ctx) return;
-    active=false; cancelAnimationFrame(raf);
-    master.gain.cancelScheduledValues(ctx.currentTime);
-    master.gain.setValueAtTime(master.gain.value,ctx.currentTime);
-    master.gain.linearRampToValueAtTime(.0001,ctx.currentTime+1);
+  function stop() {
+    active = false;
+    cancelAnimationFrame(raf);
+    stopAll();
     toggle.classList.remove('is-on');
     toggle.setAttribute('aria-pressed','false');
     toggle.setAttribute('aria-label','Включить звуковую версию');
     label.textContent='Звук';
-    try{localStorage.setItem('vslastSound','off')}catch(e){}
+    try { localStorage.setItem('vslastSound','off'); } catch(e) {}
   }
 
-  toggle.addEventListener('click',async(e)=>{
+  async function onScroll() {
+    if (!active) return;
+    if (Math.abs(window.scrollY - lastScrollY) < 3) return;
+    lastScrollY = window.scrollY;
+    await applyZone();
+  }
+
+  toggle.addEventListener('click', async e => {
     e.preventDefault();
-    if(active) stop(); else await start();
+    if (active) stop(); else await start();
   });
 
-  // If sound was enabled previously, wait for the first real user gesture,
-  // then start from that gesture. This is compatible with iOS Safari.
-  try{
-    if(localStorage.getItem('vslastSound')==='on'){
-      const resume=()=>{ if(!active) start(); };
-      window.addEventListener('pointerdown',resume,{once:true});
-      window.addEventListener('touchend',resume,{once:true,passive:true});
-      window.addEventListener('keydown',resume,{once:true});
-    }
-  }catch(e){}
+  window.addEventListener('scroll', onScroll, {passive:true});
 
-  return {start,stop};
+  // Previously enabled sound: resume only from a genuine user gesture.
+  try {
+    if (localStorage.getItem('vslastSound') === 'on') {
+      const resume = async () => {
+        if (!active) await start();
+        window.removeEventListener('pointerdown', resume);
+        window.removeEventListener('touchend', resume);
+        window.removeEventListener('keydown', resume);
+      };
+      window.addEventListener('pointerdown', resume, {once:true});
+      window.addEventListener('touchend', resume, {once:true,passive:true});
+      window.addEventListener('keydown', resume, {once:true});
+    }
+  } catch(e) {}
+
+  return {start, stop};
 })();
 
 /* ============================================================
