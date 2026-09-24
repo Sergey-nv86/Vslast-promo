@@ -1591,207 +1591,93 @@ footer{background:var(--ink);border-top:1px solid rgba(247,242,234,.1);padding:6
 
 <script>
 
-/* ---------- SOUND: real audio cinematic sound design ---------- */
+/* ---------- SOUND: one calm piano + saxophone theme ---------- */
 const Soundscape = (() => {
   const toggle = document.querySelector('#soundToggle');
   const label = document.querySelector('#soundLabel');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const tracks = {
-    ambience: 'audio/hero-ambience.mp3',
-    theme: 'audio/theme-piano.mp3',
-    craft: 'audio/bread-craft.mp3',
-    oven: 'audio/oven-bread.mp3',
-    dessert: 'audio/dessert-atmosphere.mp3',
-    final: 'audio/final-theme.mp3',
-    accent: 'audio/bread-accent.mp3'
-  };
+  // One continuous musical atmosphere for the whole site.
+  // The track is started only from a real user gesture for iOS Safari.
+  const track = 'audio/theme-piano-sax.mp3';
+  const audio = new Audio(track);
 
-  const zones = [
-    {id:'hero', name:'hero'},
-    {id:'people', name:'people'},
-    {id:'manifesto', name:'manifesto'},
-    {id:'craft', name:'craft'},
-    {id:'mastery', name:'mastery'},
-    {id:'order', name:'final'}
-  ];
+  audio.preload = 'auto';
+  audio.loop = true;
+  audio.playsInline = true;
+  audio.volume = 0;
+  audio.setAttribute('aria-hidden','true');
+  audio.style.display = 'none';
+  document.body.appendChild(audio);
 
-  const players = {};
   let active = false;
-  let currentZone = '';
-  let raf = 0;
-  let lastScrollY = window.scrollY;
-  let initialized = false;
-  let accentPlayed = false;
+  let volumeFrame = 0;
 
-  const levels = {
-    ambience: .11,
-    theme: .13,
-    craft: .14,
-    oven: .075,
-    dessert: .10,
-    final: .13
-  };
+  const targetVolume = reduceMotion ? 0.045 : 0.075;
 
-  function makePlayer(key, loop = true) {
-    const audio = new Audio(tracks[key]);
-    audio.preload = 'auto';
-    audio.loop = loop;
-    audio.playsInline = true;
-    audio.crossOrigin = 'anonymous';
-    audio.volume = 0;
-    audio.setAttribute('aria-hidden','true');
-    audio.style.display = 'none';
-    document.body.appendChild(audio);
-    players[key] = audio;
-    return audio;
-  }
-
-  function setup() {
-    if (initialized) return;
-    initialized = true;
-    ['ambience','theme','craft','oven','dessert','final'].forEach(key => makePlayer(key, true));
-    makePlayer('accent', false);
-
-    Object.entries(players).forEach(([key, audio]) => {
-      audio.addEventListener('error', () => {
-        console.warn('[Всласть] Audio asset unavailable:', tracks[key]);
-      });
-    });
-  }
-
-  function setVolume(key, target, duration = 1.8) {
-    const audio = players[key];
-    if (!audio) return;
+  function fadeTo(target, duration = 2.8) {
+    cancelAnimationFrame(volumeFrame);
     const from = audio.volume;
     const started = performance.now();
+
     const tick = now => {
       const p = Math.min((now - started) / (duration * 1000), 1);
-      const eased = p < .5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+      const eased = p < .5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
       audio.volume = from + (target - from) * eased;
-      if (p < 1) requestAnimationFrame(tick);
+      if (p < 1) volumeFrame = requestAnimationFrame(tick);
     };
-    requestAnimationFrame(tick);
-  }
 
-  async function play(key) {
-    const audio = players[key];
-    if (!audio) return;
-    if (audio.paused) {
-      try { await audio.play(); } catch(e) { return; }
-    }
-  }
-
-  function pause(key, duration = 1.5) {
-    const audio = players[key];
-    if (!audio) return;
-    const from = audio.volume;
-    const started = performance.now();
-    const tick = now => {
-      const p = Math.min((now - started) / (duration * 1000), 1);
-      audio.volume = from * (1 - p);
-      if (p < 1) requestAnimationFrame(tick);
-      else audio.pause();
-    };
-    requestAnimationFrame(tick);
-  }
-
-  function zoneAtScroll() {
-    const y = window.scrollY + window.innerHeight * .45;
-    let found = zones[0];
-    zones.forEach(zone => {
-      const el = document.getElementById(zone.id);
-      if (el && y >= el.offsetTop) found = zone;
-    });
-    return found.name;
-  }
-
-  async function applyZone() {
-    if (!active) return;
-    const zone = zoneAtScroll();
-    if (zone === currentZone) return;
-    currentZone = zone;
-
-    const targets = {
-      hero:     {ambience:.11, theme:.025, craft:0, oven:0, dessert:0, final:0},
-      people:   {ambience:.07, theme:.12, craft:0, oven:0, dessert:0, final:0},
-      manifesto:{ambience:.035,theme:0,    craft:0, oven:0, dessert:0, final:0},
-      craft:    {ambience:.025,theme:.08,  craft:.13,oven:.065,dessert:0,final:0},
-      mastery:  {ambience:.018,theme:.025, craft:0, oven:0,dessert:.10,final:0},
-      final:    {ambience:.04, theme:0,    craft:0, oven:0,dessert:0,final:.13}
-    }[zone];
-
-    await Promise.all(Object.keys(targets).map(play));
-    Object.keys(targets).forEach(key => setVolume(key, reduceMotion ? targets[key] * .65 : targets[key], 2.2));
-
-    if (zone === 'craft' && !accentPlayed) {
-      accentPlayed = true;
-      const a = players.accent;
-      if (a) {
-        a.currentTime = 0;
-        a.volume = .18;
-        a.play().catch(()=>{});
-      }
-    }
-  }
-
-  function stopAll() {
-    Object.keys(players).forEach(key => {
-      const audio = players[key];
-      audio.pause();
-      audio.volume = 0;
-      if (key !== 'accent') audio.currentTime = 0;
-    });
+    volumeFrame = requestAnimationFrame(tick);
   }
 
   async function start() {
-    setup();
-
-    // iOS Safari requires playback to begin inside the user gesture.
-    const first = players.ambience;
     try {
-      await first.play();
-    } catch(e) {
+      await audio.play();
+    } catch (e) {
+      console.warn('[Всласть] Audio playback was blocked:', e);
       return;
     }
 
     active = true;
-    currentZone = '';
-    accentPlayed = false;
     toggle.classList.add('is-on');
     toggle.setAttribute('aria-pressed','true');
-    toggle.setAttribute('aria-label','Выключить звуковую версию');
-    label.textContent='Звук · ON';
+    toggle.setAttribute('aria-label','Выключить фоновую музыку');
+    label.textContent = 'Звук · ON';
+    fadeTo(targetVolume, 3.2);
+
     try { localStorage.setItem('vslastSound','on'); } catch(e) {}
-    await applyZone();
   }
 
   function stop() {
     active = false;
-    cancelAnimationFrame(raf);
-    stopAll();
+    fadeTo(0, 2.2);
+
+    window.setTimeout(() => {
+      if (!active) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }, 2300);
+
     toggle.classList.remove('is-on');
     toggle.setAttribute('aria-pressed','false');
-    toggle.setAttribute('aria-label','Включить звуковую версию');
-    label.textContent='Звук';
-    try { localStorage.setItem('vslastSound','off'); } catch(e) {}
-  }
+    toggle.setAttribute('aria-label','Включить фоновую музыку');
+    label.textContent = 'Звук';
 
-  async function onScroll() {
-    if (!active) return;
-    if (Math.abs(window.scrollY - lastScrollY) < 3) return;
-    lastScrollY = window.scrollY;
-    await applyZone();
+    try { localStorage.setItem('vslastSound','off'); } catch(e) {}
   }
 
   toggle.addEventListener('click', async e => {
     e.preventDefault();
-    if (active) stop(); else await start();
+    if (active) stop();
+    else await start();
   });
 
-  window.addEventListener('scroll', onScroll, {passive:true});
+  audio.addEventListener('error', () => {
+    console.warn('[Всласть] Audio asset unavailable:', track);
+  });
 
-  // Previously enabled sound: resume only from a genuine user gesture.
+  // If sound was enabled previously, resume only after a genuine user gesture.
   try {
     if (localStorage.getItem('vslastSound') === 'on') {
       const resume = async () => {
